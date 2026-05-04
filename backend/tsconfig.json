@@ -20,19 +20,18 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "baseUrl": "./",
     "paths": {
-      "@app/*": ["src/*"],
-      "@common/*": ["src/common/*"],
-      "@prisma/*": ["src/prisma/*"],
-      "@auth/*": ["src/auth/*"],
-      "@users/*": ["src/users/*"],
-      "@events/*": ["src/events/*"],
-      "@registrations/*": ["src/registrations/*"],
-      "@notifications/*": ["src/notifications/*"],
-      "@tags/*": ["src/tags/*"],
-      "@dashboard/*": ["src/dashboard/*"],
-      "@health/*": ["src/health/*"]
+      "@app/*": ["./src/*"],
+      "@common/*": ["./src/common/*"],
+      "@prisma/*": ["./src/prisma/*"],
+      "@auth/*": ["./src/auth/*"],
+      "@users/*": ["./src/users/*"],
+      "@events/*": ["./src/events/*"],
+      "@registrations/*": ["./src/registrations/*"],
+      "@notifications/*": ["./src/notifications/*"],
+      "@tags/*": ["./src/tags/*"],
+      "@dashboard/*": ["./src/dashboard/*"],
+      "@health/*": ["./src/health/*"]
     }
   }
 }
