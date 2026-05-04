@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EventType {
+  in_person
+  virtual
+  hybrid
+}
+
+enum EventStatus {
+  draft
+  published
+  cancelled
+  completed
+}
+
+enum OrganizerRole {
+  owner
+  co_host
+}
+
+enum RegistrationStatus {
+  confirmed
+  waitlisted
+  cancelled
+}
+
+enum NotificationType {
+  confirmation
+  cancellation
+  waitlist_promotion
+  reminder_24h
+  reminder_1h
+}
+
+enum NotificationChannel {
+  email
+}
+
+enum NotificationStatus {
+  sent
+  failed
+  bounced
+}
+
+model User {
+  id         String   @id @default(uuid()) @db.Uuid
+  full_name  String   @db.VarChar(255)
+  email      String   @unique @db.VarChar(255)
+  avatar_url String?  @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  event_organizers event_organizers[]
+  registrations    Registration[]
+
+  @@map("users")
+}
+
+model Event {
+  id           String      @id @default(uuid()) @db.Uuid
+  title        String      @db.VarChar(255)
+  description  String?     @db.Text
+  location     String?     @db.VarChar(500)
+  meeting_url  String?     @db.Text
+  event_type   EventType
+  status       EventStatus @default(draft)
+  starts_at    DateTime    @db.Timestamptz
+  ends_at      DateTime    @db.Timestamptz
+  capacity     Int?
+  banner_url   String?     @db.Text
+  calendar_uid String      @unique @db.VarChar(255)
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
+
+  organizers    event_organizers[]
+  registrations Registration[]
+  tags          event_tags[]
+
+  @@index([starts_at])
+  @@index([status])
+  @@map("events")
+}
+
+model event_organizers {
+  event_id  String        @db.Uuid
+  user_id   String        @db.Uuid
+  role      OrganizerRole
+  joined_at DateTime      @default(now())
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [user_id], references: [id])
+
+  @@id([event_id, user_id])
+}
+
+model Registration {
+  id                String             @id @default(uuid()) @db.Uuid
+  event_id          String             @db.Uuid
+  user_id           String             @db.Uuid
+  status            RegistrationStatus
+  waitlist_position Int?
+  token             String             @unique @default(uuid()) @db.Uuid
+  registered_at     DateTime           @default(now())
+  cancelled_at      DateTime?
+
+  event             Event               @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  user              User                @relation(fields: [user_id], references: [id])
+  notification_logs NotificationLog[]
+
+  @@unique([event_id, user_id])
+  @@index([event_id, status])
+  @@index([event_id, waitlist_position])
+  @@map("registrations")
+}
+
+model Tag {
+  id   String @id @default(uuid()) @db.Uuid
+  name String @unique @db.VarChar(100)
+  slug String @unique @db.VarChar(100)
+
+  events event_tags[]
+
+  @@map("tags")
+}
+
+model event_tags {
+  event_id String @db.Uuid
+  tag_id   String @db.Uuid
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  tag   Tag   @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([event_id, tag_id])
+}
+
+model NotificationLog {
+  id              String              @id @default(uuid()) @db.Uuid
+  registration_id String              @db.Uuid
+  type            NotificationType
+  channel         NotificationChannel @default(email)
+  status          NotificationStatus
+  sent_at         DateTime?
+  error_message   String?             @db.Text
+
+  registration Registration @relation(fields: [registration_id], references: [id], onDelete: Cascade)
+
+  @@index([registration_id, type])
+  @@map("notification_logs")
+}
