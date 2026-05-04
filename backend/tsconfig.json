@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false,
+    "rootDir": ".",
+    "paths": {
+      "@app/*": ["./src/*"],
+      "@common/*": ["./src/common/*"],
+      "@prisma/*": ["./src/prisma/*"],
+      "@auth/*": ["./src/auth/*"],
+      "@users/*": ["./src/users/*"],
+      "@events/*": ["./src/events/*"],
+      "@registrations/*": ["./src/registrations/*"],
+      "@notifications/*": ["./src/notifications/*"],
+      "@tags/*": ["./src/tags/*"],
+      "@dashboard/*": ["./src/dashboard/*"],
+      "@health/*": ["./src/health/*"]
+    }
+  }
+}
