@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { MicrosoftStrategy } from './strategies/microsoft.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import { UsersModule } from '@users/users.module';
 
 @Module({
@@ -21,14 +22,14 @@ import { UsersModule } from '@users/users.module';
         signOptions: {
           expiresIn: configService.get<string>(
             'JWT_EXPIRATION',
-            '15m',
+            '7d',
           ) as StringValue,
         },
       }),
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, MicrosoftStrategy],
+  providers: [AuthService, GoogleStrategy, MicrosoftStrategy, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}
