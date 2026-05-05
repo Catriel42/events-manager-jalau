@@ -10,6 +10,17 @@ export class AuthService {
 
   public isAuthenticated = computed(() => this.tokenSignal() !== null);
 
+  public isAdmin = computed(() => {
+    const token = this.tokenSignal();
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role === 'admin';
+    } catch {
+      return false;
+    }
+  });
+
   constructor() {}
 
   /**

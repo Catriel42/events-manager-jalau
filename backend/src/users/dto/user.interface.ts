@@ -3,6 +3,7 @@ export interface UserEntity {
   full_name: string;
   email: string;
   avatar_url: string | null;
+  role: 'admin' | 'user';
   created_at: Date;
   updated_at: Date;
 }

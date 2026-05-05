@@ -15,7 +15,6 @@ async function main() {
 
   await prisma.notificationLog.deleteMany();
   await prisma.registration.deleteMany();
-  await prisma.event_organizers.deleteMany();
   await prisma.event_tags.deleteMany();
   await prisma.event.deleteMany();
   await prisma.tag.deleteMany();
@@ -28,6 +27,7 @@ async function main() {
       full_name: 'Catriel Dev',
       email: 'catriel@jala.university',
       avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Catriel',
+      role: 'admin',
     },
   });
 
@@ -56,12 +56,6 @@ async function main() {
       ), // + 2 hours
       capacity: 50,
       calendar_uid: 'angular-v21-workshop@jala.u',
-      organizers: {
-        create: {
-          user_id: user1.id,
-          role: 'owner',
-        },
-      },
       tags: {
         create: [{ tag_id: tagTech.id }, { tag_id: tagJala.id }],
       },

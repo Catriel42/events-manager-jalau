@@ -4,6 +4,7 @@ import { UserEntity } from '@users/dto/user.interface';
 export interface AuthPayload {
   sub: string;
   email: string;
+  role: string;
 }
 
 export interface RequestWithUser extends Request {
