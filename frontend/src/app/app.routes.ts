@@ -27,13 +27,6 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'my-events',
-    canActivate: [authGuard],
-    // We will create this module later, for now we can just redirect or leave it empty
-    // loadChildren: () => ...
-    redirectTo: 'events', 
-  },
-  {
     path: 'cancel/:token',
     loadComponent: () =>
       import('./features/cancel/ui/cancel-page').then((m) => m.CancelPage),
