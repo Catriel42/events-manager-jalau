@@ -19,7 +19,7 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
-  JWT_EXPIRATION: string = '15m';
+  JWT_EXPIRATION: string = '7d';
 
   @IsString()
   @IsNotEmpty()
