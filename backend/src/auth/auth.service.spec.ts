@@ -5,17 +5,15 @@ import { UsersService } from '../users/users.service';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let usersService: jest.Mocked<UsersService>;
-  let jwtService: jest.Mocked<JwtService>;
+
+  const mockUsersService = {
+    upsertByEmail: jest.fn(),
+  };
+  const mockJwtService = {
+    sign: jest.fn(),
+  };
 
   beforeEach(async () => {
-    const mockUsersService = {
-      upsertByEmail: jest.fn(),
-    };
-    const mockJwtService = {
-      sign: jest.fn(),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -25,30 +23,40 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    usersService = module.get(UsersService);
-    jwtService = module.get(JwtService);
   });
 
-  it('should be defined', () => {
+  it('debería estar definido', () => {
     expect(service).toBeDefined();
   });
 
   describe('validateOAuthUser', () => {
-    it('should create or update a user and return a token', async () => {
-      const userData = { email: 'cato@example.com', fullName: 'Cato', avatarUrl: 'url' };
-      const dbUser = { id: 'uuid-123', email: 'cato@example.com', full_name: 'Cato', avatar_url: 'url' };
+    it('debería crear/actualizar usuario y devolver un token', async () => {
+      const userData = {
+        email: 'cato@example.com',
+        fullName: 'Cato',
+        avatarUrl: 'url',
+      };
+      const dbUser = {
+        id: 'uuid-123',
+        email: 'cato@example.com',
+        full_name: 'Cato',
+        avatar_url: 'url',
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
       const fakeToken = 'jwt.token.here';
-      usersService.upsertByEmail.mockResolvedValue(dbUser as any);
-      jwtService.sign.mockReturnValue(fakeToken);
+
+      mockUsersService.upsertByEmail.mockResolvedValue(dbUser);
+      mockJwtService.sign.mockReturnValue(fakeToken);
 
       const result = await service.validateOAuthUser(userData);
 
-      expect(usersService.upsertByEmail).toHaveBeenCalledWith(userData);
-      expect(jwtService.sign).toHaveBeenCalledWith({ sub: 'uuid-123', email: 'cato@example.com' });
-      expect(result).toEqual({
-        user: dbUser,
-        accessToken: fakeToken,
+      expect(mockUsersService.upsertByEmail).toHaveBeenCalledWith(userData);
+      expect(mockJwtService.sign).toHaveBeenCalledWith({
+        sub: 'uuid-123',
+        email: 'cato@example.com',
       });
+      expect(result).toEqual({ user: dbUser, accessToken: fakeToken });
     });
   });
 });
