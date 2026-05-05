@@ -14,7 +14,7 @@ export class EventsService {
       this.prisma.event.findMany({
         skip,
         take: limit,
-        orderBy: { created_at: 'desc' },
+        orderBy: { starts_at: 'desc' },
         include: {
           tags: {
             include: {
