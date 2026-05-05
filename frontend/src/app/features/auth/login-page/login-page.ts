@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { environment } from '@env/environment';
+import { ThemeService } from '@core/services/theme.service';
 
 @Component({
   selector: 'app-login-page',
@@ -8,6 +9,8 @@ import { environment } from '@env/environment';
   styleUrl: './login-page.css',
 })
 export class LoginPage {
+  public themeService = inject(ThemeService);
+
   loginWithGoogle(): void {
     window.location.href = `${environment.apiUrl}/auth/google`;
   }
