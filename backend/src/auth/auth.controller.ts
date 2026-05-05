@@ -3,12 +3,16 @@ import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { MicrosoftAuthGuard } from './guards/microsoft-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
-import type { Response, Request } from 'express';
-import type { RequestWithUser } from './dto/auth-payload.dto';
+import { UsersService } from '@users/users.service';
+import type { Response } from 'express';
+import type { RequestWithUser, RequestWithJwt } from './dto/auth-payload.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    private usersService: UsersService,
+  ) {}
 
   @Get('google')
   @UseGuards(GoogleAuthGuard)
@@ -38,7 +42,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Req() req: Request) {
-    return req.user;
+  async getProfile(@Req() req: RequestWithJwt) {
+    return this.usersService.findById(req.user.id);
   }
 }

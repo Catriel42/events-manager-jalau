@@ -9,11 +9,11 @@ export const authRoutes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./ui/login-page').then((m) => m.LoginPage),
+      import('./login-page/login-page').then((m) => m.LoginPage),
   },
   {
     path: 'callback',
     loadComponent: () =>
-      import('./ui/auth-callback').then((m) => m.AuthCallback),
+      import('./auth-callback').then((m) => m.AuthCallback),
   },
 ];
