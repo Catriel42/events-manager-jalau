@@ -9,6 +9,7 @@ describe('UsersService', () => {
     user: {
       upsert: jest.fn().mockImplementation(() => Promise.resolve()),
       findUnique: jest.fn().mockImplementation(() => Promise.resolve()),
+      count: jest.fn().mockImplementation(() => Promise.resolve(1)),
     },
   };
 
@@ -58,6 +59,7 @@ describe('UsersService', () => {
           email: userData.email,
           full_name: userData.fullName,
           avatar_url: userData.avatarUrl,
+          role: 'user',
         },
       });
       expect(result).toEqual(expectedResult);

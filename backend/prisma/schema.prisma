@@ -12,6 +12,11 @@ enum EventType {
   hybrid
 }
 
+enum GlobalRole {
+  admin
+  user
+}
+
 enum EventStatus {
   draft
   published
@@ -19,10 +24,7 @@ enum EventStatus {
   completed
 }
 
-enum OrganizerRole {
-  owner
-  co_host
-}
+
 
 enum RegistrationStatus {
   confirmed
@@ -49,15 +51,15 @@ enum NotificationStatus {
 }
 
 model User {
-  id         String   @id @default(uuid()) @db.Uuid
-  full_name  String   @db.VarChar(255)
-  email      String   @unique @db.VarChar(255)
-  avatar_url String?  @db.Text
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id         String     @id @default(uuid()) @db.Uuid
+  full_name  String     @db.VarChar(255)
+  email      String     @unique @db.VarChar(255)
+  avatar_url String?    @db.Text
+  role       GlobalRole @default(user)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
 
-  event_organizers event_organizers[]
-  registrations    Registration[]
+  registrations Registration[]
 
   @@map("users")
 }
@@ -78,7 +80,6 @@ model Event {
   created_at   DateTime    @default(now())
   updated_at   DateTime    @updatedAt
 
-  organizers    event_organizers[]
   registrations Registration[]
   tags          event_tags[]
 
@@ -87,17 +88,7 @@ model Event {
   @@map("events")
 }
 
-model event_organizers {
-  event_id  String        @db.Uuid
-  user_id   String        @db.Uuid
-  role      OrganizerRole
-  joined_at DateTime      @default(now())
 
-  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [user_id], references: [id])
-
-  @@id([event_id, user_id])
-}
 
 model Registration {
   id                String             @id @default(uuid()) @db.Uuid
