@@ -13,3 +13,11 @@ export interface RequestWithUser extends Request {
     accessToken: string;
   };
 }
+
+export interface RequestWithJwt extends Request {
+  user: {
+    id: string;
+    email: string;
+    role: string;
+  };
+}

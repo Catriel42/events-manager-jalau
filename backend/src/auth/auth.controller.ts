@@ -4,8 +4,8 @@ import { MicrosoftAuthGuard } from './guards/microsoft-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '@users/users.service';
-import type { Response, Request } from 'express';
-import type { RequestWithUser } from './dto/auth-payload.dto';
+import type { Response } from 'express';
+import type { RequestWithUser, RequestWithJwt } from './dto/auth-payload.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -42,7 +42,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getProfile(@Req() req: any) {
+  async getProfile(@Req() req: RequestWithJwt) {
     // req.user contains { id, email, role } from JwtStrategy
     return this.usersService.findById(req.user.id);
   }
