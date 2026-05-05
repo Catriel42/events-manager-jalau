@@ -10,6 +10,7 @@ import { TagsModule } from './tags/tags.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { HealthModule } from './health/health.module';
 import { validate } from './common/config/env.validation';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { validate } from './common/config/env.validation';
     TagsModule,
     DashboardModule,
     HealthModule,
+    FilesModule,
   ],
 })
 export class AppModule {}

@@ -57,6 +57,18 @@ export class EnvironmentVariables {
   @IsNumber()
   @IsOptional()
   PORT: number = 3000;
+
+  @IsString()
+  @IsOptional()
+  CLOUDINARY_CLOUD_NAME?: string;
+
+  @IsString()
+  @IsOptional()
+  CLOUDINARY_API_KEY?: string;
+
+  @IsString()
+  @IsOptional()
+  CLOUDINARY_API_SECRET?: string;
 }
 
 export function validate(config: Record<string, unknown>) {
