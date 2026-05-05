@@ -77,6 +77,18 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@app/(.*)$": "<rootDir>/$1",
+      "^@common/(.*)$": "<rootDir>/common/$1",
+      "^@auth/(.*)$": "<rootDir>/auth/$1",
+      "^@users/(.*)$": "<rootDir>/users/$1",
+      "^@events/(.*)$": "<rootDir>/events/$1",
+      "^@registrations/(.*)$": "<rootDir>/registrations/$1",
+      "^@notifications/(.*)$": "<rootDir>/notifications/$1",
+      "^@tags/(.*)$": "<rootDir>/tags/$1",
+      "^@dashboard/(.*)$": "<rootDir>/dashboard/$1",
+      "^@health/(.*)$": "<rootDir>/health/$1"
+    }
   }
 }
