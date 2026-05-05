@@ -1,6 +1,16 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject, effect } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { environment } from '@env/environment';
+import { catchError, of, tap } from 'rxjs';
 
-@Injectable({
+export interface UserProfile {
+  id: string;
+  full_name: string;
+  email: string;
+  avatar_url: string | null;
+  role: string;
+}@Injectable({
   providedIn: 'root',
 })
 export class AuthService {
@@ -9,6 +19,10 @@ export class AuthService {
   private tokenSignal = signal<string | null>(this.getTokenFromStorage());
 
   public isAuthenticated = computed(() => this.tokenSignal() !== null);
+  public currentUser = signal<UserProfile | null>(null);
+
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
   public isAdmin = computed(() => {
     const token = this.tokenSignal();
@@ -21,7 +35,14 @@ export class AuthService {
     }
   });
 
-  constructor() {}
+  constructor() {
+    effect(() => {
+      const token = this.tokenSignal();
+      if (token && !this.currentUser()) {
+        this.fetchProfile().subscribe();
+      }
+    });
+  }
 
   /**
    * Retrieves the current token string directly.
@@ -52,5 +73,28 @@ export class AuthService {
       return localStorage.getItem(this.TOKEN_KEY);
     }
     return null;
+  }
+
+  /**
+   * Fetches the current user profile from the backend.
+   */
+  public fetchProfile() {
+    return this.http.get<UserProfile>(`${environment.apiUrl}/auth/me`).pipe(
+      tap((user) => this.currentUser.set(user)),
+      catchError((error) => {
+        console.error('Failed to fetch profile', error);
+        this.removeToken();
+        return of(null);
+      })
+    );
+  }
+
+  /**
+   * Logs out the user and redirects to login.
+   */
+  public logout(): void {
+    this.removeToken();
+    this.currentUser.set(null);
+    this.router.navigate(['/auth/login']);
   }
 }
