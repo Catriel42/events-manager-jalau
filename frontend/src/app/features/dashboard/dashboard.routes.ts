@@ -1,24 +1,23 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from '@core/guards/admin.guard';
+import { EventLayout } from '@shared/layouts/event-layout/event-layout';
 
 export const dashboardRoutes: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('./ui/dashboard-home').then((m) => m.DashboardHome),
-  },
-  {
-    path: 'events/new',
-    loadComponent: () =>
-      import('../events/ui/event-form').then((m) => m.EventForm),
-  },
-  {
-    path: 'events/:id/edit',
-    loadComponent: () =>
-      import('../events/ui/event-form').then((m) => m.EventForm),
-  },
-  {
-    path: 'events/:id/registrations',
-    loadComponent: () =>
-      import('./ui/registrations-view').then((m) => m.RegistrationsView),
+    component: EventLayout,
+    canActivate: [adminGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./ui/dashboard-home').then((m) => m.DashboardHome),
+      },
+      {
+        path: 'registrations',
+        loadComponent: () =>
+          import('./ui/registrations-view').then((m) => m.RegistrationsView),
+      },
+    ],
   },
 ];
