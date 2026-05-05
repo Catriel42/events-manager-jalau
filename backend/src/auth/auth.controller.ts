@@ -1,7 +1,9 @@
 import { Controller, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { MicrosoftAuthGuard } from './guards/microsoft-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 import type { RequestWithUser } from './dto/auth-payload.dto';
 
 @Controller('auth')
@@ -19,5 +21,24 @@ export class AuthController {
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
 
     return res.redirect(`${frontendUrl}/auth/callback?token=${accessToken}`);
+  }
+
+  @Get('microsoft')
+  @UseGuards(MicrosoftAuthGuard)
+  async microsoftAuth() {}
+
+  @Get('microsoft/callback')
+  @UseGuards(MicrosoftAuthGuard)
+  microsoftAuthRedirect(@Req() req: RequestWithUser, @Res() res: Response) {
+    const { accessToken } = req.user;
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+
+    return res.redirect(`${frontendUrl}/auth/callback?token=${accessToken}`);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getProfile(@Req() req: Request) {
+    return req.user;
   }
 }

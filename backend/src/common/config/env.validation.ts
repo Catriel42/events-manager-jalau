@@ -19,7 +19,7 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
-  JWT_EXPIRATION: string = '15m';
+  JWT_EXPIRATION: string = '7d';
 
   @IsString()
   @IsNotEmpty()
@@ -32,6 +32,22 @@ export class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   GOOGLE_CALLBACK_URL!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  MICROSOFT_CLIENT_ID!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  MICROSOFT_CLIENT_SECRET!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  MICROSOFT_CALLBACK_URL!: string;
+
+  @IsString()
+  @IsOptional()
+  MICROSOFT_TENANT_ID: string = 'common';
 
   @IsString()
   @IsOptional()
