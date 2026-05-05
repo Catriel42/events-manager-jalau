@@ -1,3 +1,61 @@
 /* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+@theme {
+  --font-sans: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-blue-50: #e6eeff;
+  --color-blue-100: #cce0ff;
+  --color-blue-200: #99c2ff;
+  --color-blue-300: #66a3ff;
+  --color-blue-400: #3385ff;
+  --color-blue-500: #004dff;
+  --color-blue-600: #003fcc;
+  --color-blue-700: #003199;
+  --color-blue-800: #002266;
+  --color-blue-900: #001333;
+  --color-blue-950: #000a1a;
+
+  --color-success: #1a7f37;
+  --color-success-muted: #dafbe1;
+  --color-danger: #cf222e;
+  --color-danger-muted: #ffebe9;
+  --color-warning: #9a6700;
+  --color-warning-muted: #fff8c5;
+  --color-info: #0969da;
+  --color-info-muted: #ddf4ff;
+}
+
+/* Theme variables - Dark (default) */
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-tertiary: #1a1a1a;
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --text-subtle: rgba(255, 255, 255, 0.4);
+}
+
+/* Light theme */
+.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f8fa;
+  --bg-tertiary: #f0f3f6;
+  --bg-glass: rgba(0, 0, 0, 0.03);
+  --border-color: rgba(0, 0, 0, 0.1);
+  --text-primary: #24292f;
+  --text-secondary: rgba(36, 41, 47, 0.7);
+  --text-muted: rgba(36, 41, 47, 0.5);
+  --text-subtle: rgba(36, 41, 47, 0.4);
+}
+
+/* Apply theme variables globally */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
