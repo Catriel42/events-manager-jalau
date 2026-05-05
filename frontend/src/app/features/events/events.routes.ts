@@ -9,7 +9,7 @@ export const eventsRoutes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('./ui/event-list').then((m) => m.EventList),
+          import('./event-list/event-list').then((m) => m.EventList),
       },
       {
         path: ':id',

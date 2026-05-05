@@ -1,12 +1,12 @@
 <nav class="sticky top-0 z-50 bg-[var(--bg-glass)] backdrop-blur-xl border-b border-[var(--border-color)]">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
+    <div class="flex items-center justify-between h-20">
 <!-- Logo -->
       <a routerLink="/events" class="flex items-center gap-3 no-underline">
         @if (themeService.theme() === 'dark') {
-          <img src="/logo-dark.svg" alt="" class="w-36 h-36">
+          <img src="/logo-dark.svg" alt="" class="w-40 h-40">
           } @else {
-            <img src="/logo-light.svg" alt="" class="w-36 h-36">
+            <img src="/logo-light.svg" alt="" class="w-40 max-h-40">
           }
       </a>
 
@@ -36,16 +36,16 @@
                 </div>
               }
             </button>
-            
+
             @if (isDropdownOpen) {
               <div class="fixed inset-0 z-40" (click)="isDropdownOpen = false"></div>
-              
+
               <div class="absolute right-0 mt-2 w-56 bg-[var(--bg-secondary)] backdrop-blur-xl border border-[var(--border-color)] rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in scale-95 duration-200">
                 <div class="px-4 py-3 border-b border-[var(--border-color)]">
                   <p class="text-[var(--text-primary)] font-medium text-sm truncate">{{ authService.currentUser()?.full_name }}</p>
                   <p class="text-[var(--text-muted)] text-xs truncate">{{ authService.currentUser()?.email }}</p>
                 </div>
-                
+
                 <div class="py-1">
                   @if (authService.isAdmin()) {
                     <a routerLink="/dashboard" (click)="isDropdownOpen = false" class="block px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] transition-colors">
@@ -57,7 +57,7 @@
                     </a>
                   }
                 </div>
-                
+
                 <div class="border-t border-[var(--border-color)] py-1">
                   <button (click)="logout()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
                     Log out

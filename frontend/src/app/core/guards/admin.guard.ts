@@ -10,7 +10,6 @@ export const adminGuard: CanActivateFn = () => {
     return true;
   }
 
-  // If not an admin, redirect to the public events page
   const redirectPath = router.createUrlTree(['/events']);
   return new RedirectCommand(redirectPath);
 };

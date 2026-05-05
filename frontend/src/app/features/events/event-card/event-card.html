@@ -1,0 +1,55 @@
+<a [routerLink]="['/events', event().id]" class="block">
+  <article class="bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl overflow-hidden hover:border-blue-500/30 transition-all duration-300 group">
+    <!-- Banner -->
+    <div class="h-48 w-full overflow-hidden">
+      @if (event().banner_url) {
+        <img [src]="event().banner_url" [alt]="event().title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      } @else {
+        <div class="w-full h-full bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center">
+          <svg class="w-16 h-16 text-blue-500/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+      }
+    </div>
+
+    <!-- Contenido -->
+    <div class="p-4">
+      <!-- Badges -->
+      <div class="flex gap-2 mb-3">
+        <span class="px-2 py-1 rounded-full text-xs font-medium" 
+          [class]="getEventTypeClass(event().event_type)">
+          {{ getEventTypeLabel(event().event_type) }}
+        </span>
+        <span class="px-2 py-1 rounded-full text-xs font-medium"
+          [class]="getEventStatusClass(event().status)">
+          {{ getEventStatusLabel(event().status) }}
+        </span>
+      </div>
+
+      <!-- Título -->
+      <h3 class="text-[var(--text-primary)] font-medium text-lg mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
+        {{ event().title }}
+      </h3>
+
+      <!-- Fecha -->
+      <div class="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-2">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        {{ formatDate(event().starts_at) }}
+      </div>
+
+      <!-- Ubicación -->
+      @if (event().location) {
+        <div class="flex items-center gap-2 text-sm text-[var(--text-muted)]">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span class="truncate">{{ event().location }}</span>
+        </div>
+      }
+    </div>
+  </article>
+</a>
