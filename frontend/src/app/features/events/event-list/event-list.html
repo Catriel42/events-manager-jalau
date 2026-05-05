@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-[var(--bg-primary)]">
   <!-- Header -->
   <div class="py-8 px-4">
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-4xl mx-auto">
       <h1 class="text-3xl font-medium text-[var(--text-primary)] mb-2">Eventos</h1>
       <p class="text-[var(--text-secondary)]">Descubre los próximos eventos disponibles</p>
     </div>
@@ -9,67 +9,81 @@
 
   <!-- Loading State -->
   @if (isLoading()) {
-    <div class="max-w-7xl mx-auto px-4 py-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-          <div class="bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl overflow-hidden">
-            <div class="h-48 bg-[var(--bg-tertiary)] animate-pulse"></div>
-            <div class="p-4 space-y-3">
-              <div class="flex gap-2">
-                <div class="h-6 w-16 bg-[var(--bg-tertiary)] rounded-full animate-pulse"></div>
-                <div class="h-6 w-20 bg-[var(--bg-tertiary)] rounded-full animate-pulse"></div>
-              </div>
-              <div class="h-6 bg-[var(--bg-tertiary)] rounded animate-pulse"></div>
-              <div class="h-4 w-3/4 bg-[var(--bg-tertiary)] rounded animate-pulse"></div>
-            </div>
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+      <div
+        class="bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl overflow-hidden">
+        <div class="h-48 bg-[var(--bg-tertiary)] animate-pulse"></div>
+        <div class="p-4 space-y-3">
+          <div class="flex gap-2">
+            <div class="h-6 w-16 bg-[var(--bg-tertiary)] rounded-full animate-pulse"></div>
+            <div class="h-6 w-20 bg-[var(--bg-tertiary)] rounded-full animate-pulse"></div>
           </div>
-        }
+          <div class="h-6 bg-[var(--bg-tertiary)] rounded animate-pulse"></div>
+          <div class="h-4 w-3/4 bg-[var(--bg-tertiary)] rounded animate-pulse"></div>
+        </div>
       </div>
+      }
     </div>
+  </div>
   }
 
   <!-- Empty State -->
   @if (!isLoading() && !hasEvents()) {
-    <div class="max-w-7xl mx-auto px-4 py-16">
-      <div class="text-center">
-        <svg class="w-16 h-16 mx-auto text-[var(--text-muted)] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        <h2 class="text-xl font-medium text-[var(--text-primary)] mb-2">No hay eventos publicados</h2>
-        <p class="text-[var(--text-muted)]">Vuelve más tarde para ver nuevos eventos</p>
-      </div>
+  <div class="max-w-7xl mx-auto px-4 py-16">
+    <div class="text-center">
+      <svg class="w-16 h-16 mx-auto text-[var(--text-muted)] mb-4" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <h2 class="text-xl font-medium text-[var(--text-primary)] mb-2">No hay eventos publicados</h2>
+      <p class="text-[var(--text-muted)]">Vuelve más tarde para ver nuevos eventos</p>
     </div>
+  </div>
   }
 
   <!-- Events Grid -->
   @if (!isLoading() && hasEvents()) {
-    <div class="max-w-7xl mx-auto px-4 py-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @for (event of events(); track event.id) {
-          <app-event-card [event]="event" />
-        }
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Timeline Container -->
+    <div class="relative max-w-4xl mx-auto py-4">
+      <!-- Vertical Dotted Line -->
+      <div class="absolute left-6 md:left-8 top-0 bottom-0 w-px border-l-2 border-dotted border-[var(--border-color)]">
       </div>
 
-      <!-- Pagination -->
-      @if (totalPages() > 1) {
-        <div class="flex items-center justify-center gap-4 mt-12">
-          <button 
-            (click)="prevPage()" 
-            [disabled]="currentPage() === 1"
-            class="px-4 py-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-            Anterior
-          </button>
-          <span class="text-[var(--text-secondary)]">
-            {{ currentPage() }} / {{ totalPages() }}
-          </span>
-          <button 
-            (click)="nextPage()" 
-            [disabled]="currentPage() === totalPages()"
-            class="px-4 py-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-            Siguiente
-          </button>
+      <div class="space-y-12">
+        @for (event of events(); track event.id) {
+        <div class="relative pl-16 md:pl-24">
+          <!-- Timeline Indicator Dot -->
+          <div
+            class="absolute left-[19px] md:left-[27px] top-8 w-3 h-3 bg-[var(--text-primary)] rounded-full ring-4 ring-[var(--bg-primary)]">
+          </div>
+
+          <!-- Event Card (Wrapped so it stretches) -->
+          <app-event-card [event]="event" class="block w-full transition-transform hover:-translate-y-1 duration-300" />
         </div>
-      }
+        }
+      </div>
     </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+    <div class="flex items-center justify-center gap-4 mt-12">
+      <button (click)="prevPage()" [disabled]="currentPage() === 1"
+        class="px-4 py-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        Anterior
+      </button>
+      <span class="text-[var(--text-secondary)]">
+        {{ currentPage() }} / {{ totalPages() }}
+      </span>
+      <button (click)="nextPage()" [disabled]="currentPage() === totalPages()"
+        class="px-4 py-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        Siguiente
+      </button>
+    </div>
+    }
+  </div>
   }
 </div>
