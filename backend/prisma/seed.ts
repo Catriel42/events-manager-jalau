@@ -22,7 +22,7 @@ async function main() {
 
   console.log('Database cleaned.');
 
-  const user1 = await prisma.user.create({
+  await prisma.user.create({
     data: {
       full_name: 'Catriel Dev',
       email: 'catriel@jala.university',
@@ -53,7 +53,7 @@ async function main() {
       starts_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       ends_at: new Date(
         Date.now() + 7 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000,
-      ), // + 2 hours
+      ),
       capacity: 50,
       calendar_uid: 'angular-v21-workshop@jala.u',
       tags: {
