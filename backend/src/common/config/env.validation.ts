@@ -34,6 +34,22 @@ export class EnvironmentVariables {
   GOOGLE_CALLBACK_URL!: string;
 
   @IsString()
+  @IsNotEmpty()
+  MICROSOFT_CLIENT_ID!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  MICROSOFT_CLIENT_SECRET!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  MICROSOFT_CALLBACK_URL!: string;
+
+  @IsString()
+  @IsOptional()
+  MICROSOFT_TENANT_ID: string = 'common';
+
+  @IsString()
   @IsOptional()
   FRONTEND_URL: string = 'http://localhost:4200';
 
