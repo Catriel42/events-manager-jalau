@@ -43,7 +43,6 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async getProfile(@Req() req: RequestWithJwt) {
-    // req.user contains { id, email, role } from JwtStrategy
     return this.usersService.findById(req.user.id);
   }
 }
