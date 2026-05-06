@@ -1,0 +1,147 @@
+<div class="max-w-4xl mx-auto">
+  @if (isLoading()) {
+    <div class="flex items-center justify-center min-h-[60vh]">
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+        <p class="text-[var(--text-secondary)]">Cargando evento...</p>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="flex items-center justify-center min-h-[60vh]">
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto mb-4 text-danger/50">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <p class="text-lg text-[var(--text-primary)] mb-2">{{ error() }}</p>
+        <a routerLink="/events" class="text-blue-400 hover:text-blue-300 transition-colors">
+          ← Volver a eventos
+        </a>
+      </div>
+    </div>
+  } @else if (event(); as evt) {
+    <a routerLink="/events" class="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mb-6">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Volver a eventos
+    </a>
+
+    <article class="bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl overflow-hidden">
+      <!-- Banner -->
+      <div class="h-64 md:h-80 w-full overflow-hidden relative">
+        @if (evt.banner_url) {
+          <img [src]="evt.banner_url" [alt]="evt.title" class="w-full h-full object-cover">
+        } @else {
+          <div class="w-full h-full bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center">
+            <svg class="w-24 h-24 text-blue-500/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        }
+        <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)]/80 to-transparent"></div>
+      </div>
+
+      <!-- Contenido -->
+      <div class="p-6 md:p-8">
+        <!-- Badges -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="px-3 py-1.5 rounded-full text-sm font-medium" 
+            [class]="getEventTypeClass(evt.event_type)">
+            {{ getEventTypeLabel(evt.event_type) }}
+          </span>
+          <span class="px-3 py-1.5 rounded-full text-sm font-medium"
+            [class]="getEventStatusClass(evt.status)">
+            {{ getEventStatusLabel(evt.status) }}
+          </span>
+        </div>
+
+        <!-- Título -->
+        <h1 class="text-3xl md:text-4xl font-semibold text-[var(--text-primary)] mb-4">
+          {{ evt.title }}
+        </h1>
+
+        <!-- Tags -->
+        @if (evt.tags && evt.tags.length > 0) {
+          <div class="flex flex-wrap gap-2 mb-6">
+            @for (tag of evt.tags; track tag.id) {
+              <span class="px-3 py-1 rounded-full text-sm bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-color)]">
+                #{{ tag.name }}
+              </span>
+            }
+          </div>
+        }
+
+        <!-- Info Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <!-- Fecha y Hora -->
+          <div class="flex items-start gap-4 p-4 rounded-xl bg-[var(--bg-tertiary)]/50">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 shrink-0">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-[var(--text-muted)] mb-1">Fecha y Hora</p>
+              <p class="text-[var(--text-primary)] font-medium">{{ formatDate(evt.starts_at) }}</p>
+              <p class="text-sm text-[var(--text-secondary)]">{{ formatTimeRange(evt.starts_at, evt.ends_at) }}</p>
+            </div>
+          </div>
+
+          <!-- Ubicación / Meeting URL -->
+          @if (evt.location || evt.meeting_url) {
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-[var(--bg-tertiary)]/50">
+              <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-500/20 text-green-400 shrink-0">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  @if (evt.event_type === 'virtual') {
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  } @else {
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  }
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs uppercase tracking-wider text-[var(--text-muted)] mb-1">
+                  {{ evt.event_type === 'virtual' ? 'Meeting URL' : 'Ubicación' }}
+                </p>
+                @if (evt.location) {
+                  <p class="text-[var(--text-primary)] font-medium">{{ evt.location }}</p>
+                }
+                @if (evt.meeting_url) {
+                  <a [href]="evt.meeting_url" target="_blank" class="text-blue-400 hover:text-blue-300 transition-colors text-sm">
+                    Unirse a la reunión →
+                  </a>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Capacidad -->
+          @if (evt.capacity) {
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-[var(--bg-tertiary)]/50">
+              <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-purple-500/20 text-purple-400 shrink-0">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs uppercase tracking-wider text-[var(--text-muted)] mb-1">Capacidad</p>
+                <p class="text-[var(--text-primary)] font-medium">{{ evt.capacity }} cupos disponibles</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Descripción -->
+        @if (evt.description) {
+          <div class="border-t border-[var(--border-color)] pt-8">
+            <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-4">Acerca de este evento</h2>
+            <div class="prose prose-invert max-w-none text-[var(--text-secondary)] leading-relaxed" [innerHTML]="evt.description"></div>
+          </div>
+        }
+      </div>
+    </article>
+  }
+</div>

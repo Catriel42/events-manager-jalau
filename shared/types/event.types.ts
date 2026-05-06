@@ -1,6 +1,12 @@
 export type EventType = 'in_person' | 'virtual' | 'hybrid';
 export type EventStatus = 'draft' | 'published' | 'cancelled' | 'completed';
 
+export interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -16,6 +22,7 @@ export interface Event {
   calendar_uid: string;
   created_at: string;
   updated_at: string;
+  tags?: Tag[];
 }
 
 export interface PaginatedResponse<T> {
