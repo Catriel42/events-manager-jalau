@@ -1,8 +1,13 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, Profile, VerifyCallback } from 'passport-google-oauth20';
+import { Strategy, Profile, VerifyCallback, StrategyOptions } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
+
+interface GoogleStrategyOptions extends StrategyOptions {
+  accessType?: string;
+  prompt?: string;
+}
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -21,7 +26,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       ],
       accessType: 'offline',
       prompt: 'consent',
-    });
+    } as GoogleStrategyOptions);
   }
 
   async validate(

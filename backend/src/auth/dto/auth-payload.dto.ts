@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import { UserEntity } from '@users/dto/user.interface';
+import { StrategyOptions } from 'passport-google-oauth20';
 
 export interface AuthPayload {
   sub: string;
@@ -20,4 +21,9 @@ export interface RequestWithJwt extends Request {
     email: string;
     role: string;
   };
+}
+
+export interface GoogleStrategyOptions extends StrategyOptions {
+  accessType?: string;
+  prompt?: string;
 }
