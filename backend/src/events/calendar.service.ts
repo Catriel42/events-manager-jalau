@@ -26,10 +26,12 @@ export class CalendarService {
       } else if (user.provider === 'microsoft') {
         return await this.addToMicrosoftCalendar(user, event);
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      const stack = error instanceof Error ? error.stack : '';
       this.logger.error(
-        `Failed to add event to ${user.provider} calendar for ${user.email}`,
-        error.stack,
+        `Failed to add event to ${user.provider} calendar for ${user.email}: ${message}`,
+        stack,
       );
     }
   }
@@ -76,7 +78,7 @@ export class CalendarService {
 
   private async addToMicrosoftCalendar(user: UserEntity, event: Event) {
     const client = Client.init({
-      authProvider: async (done) => {
+      authProvider: (done) => {
         done(null, user.access_token!);
       },
     });
@@ -101,7 +103,9 @@ export class CalendarService {
       },
     };
 
-    const response = await client.api('/me/events').post(microsoftEvent);
+    const response = (await client.api('/me/events').post(microsoftEvent)) as {
+      id: string;
+    };
     this.logger.log(`Event created in Microsoft Calendar: ${response.id}`);
 
     // Microsoft no devuelve un webLink directo tan fácil en el POST,

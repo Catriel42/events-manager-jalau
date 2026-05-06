@@ -5,7 +5,6 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { CalendarService } from '../events/calendar.service';
-import { UserEntity } from '@users/dto/user.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import { Registration, RegistrationStatus } from '@prisma/client';
 

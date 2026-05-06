@@ -37,6 +37,9 @@ describe('UsersService', () => {
         email: 'test@example.com',
         fullName: 'Test User',
         avatarUrl: 'http://avatar.com',
+        provider: 'google',
+        accessToken: 'access',
+        refreshToken: 'refresh',
       };
 
       const expectedResult = {
@@ -54,12 +57,18 @@ describe('UsersService', () => {
         update: {
           full_name: userData.fullName,
           avatar_url: userData.avatarUrl,
+          provider: userData.provider,
+          access_token: userData.accessToken,
+          refresh_token: userData.refreshToken,
         },
         create: {
           email: userData.email,
           full_name: userData.fullName,
           avatar_url: userData.avatarUrl,
           role: 'user',
+          provider: userData.provider,
+          access_token: userData.accessToken,
+          refresh_token: userData.refreshToken,
         },
       });
       expect(result).toEqual(expectedResult);

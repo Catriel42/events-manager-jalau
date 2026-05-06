@@ -28,7 +28,10 @@ export class EventsController {
 
   @Post(':id/sync-calendar')
   @UseGuards(JwtAuthGuard)
-  async syncCalendar(@Param('id', ParseUUIDPipe) id: string, @Req() req: any) {
+  async syncCalendar(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: { user: { id: string } },
+  ) {
     const event = await this.eventsService.findById(id);
     const userId = req.user.id;
 
