@@ -7,11 +7,13 @@ import { CreateEventDto, UpdateEventDto } from './dto';
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(page = 1, limit = 10) {
+  async findAll(page = 1, limit = 10, includeAll = false) {
     const skip = (page - 1) * limit;
+    const where = includeAll ? {} : { status: { not: 'draft' as const } };
 
     const [data, total] = await Promise.all([
       this.prisma.event.findMany({
+        where,
         skip,
         take: limit,
         orderBy: { starts_at: 'desc' },
@@ -23,7 +25,7 @@ export class EventsService {
           },
         },
       }),
-      this.prisma.event.count(),
+      this.prisma.event.count({ where }),
     ]);
 
     const events = data.map((event) => ({

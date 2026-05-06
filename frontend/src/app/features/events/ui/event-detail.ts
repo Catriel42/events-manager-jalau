@@ -62,7 +62,7 @@ export class EventDetail {
   getEventStatusLabel(status: EventStatus): string {
     const labels: Record<EventStatus, string> = {
       draft: 'Borrador',
-      published: 'Publicado',
+      published: 'New',
       cancelled: 'Cancelado',
       completed: 'Completado'
     };
@@ -85,9 +85,7 @@ export class EventDetail {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      year: 'numeric'
     }).format(date);
   }
 

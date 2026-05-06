@@ -9,10 +9,14 @@ export class EventsApi {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/events`;
 
-  getEvents(page = 1, limit = 10): Observable<PaginatedResponse<Event>> {
+  getEvents(page = 1, limit = 10, includeAll = false): Observable<PaginatedResponse<Event>> {
     return this.http.get<PaginatedResponse<Event>>(this.baseUrl, {
-      params: { page, limit }
+      params: { page, limit, includeAll: includeAll ? 'true' : 'false' }
     });
+  }
+
+  getAllEvents(page = 1, limit = 100): Observable<PaginatedResponse<Event>> {
+    return this.getEvents(page, limit, true);
   }
 
   getEvent(id: string): Observable<Event> {

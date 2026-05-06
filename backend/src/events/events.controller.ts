@@ -19,10 +19,15 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Get()
-  findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
+  findAll(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('includeAll') includeAll?: string,
+  ) {
     return this.eventsService.findAll(
       page ? Number(page) : 1,
       limit ? Number(limit) : 10,
+      includeAll === 'true',
     );
   }
 

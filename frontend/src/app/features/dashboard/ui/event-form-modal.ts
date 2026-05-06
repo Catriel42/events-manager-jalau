@@ -20,7 +20,7 @@ import { finalize } from 'rxjs';
         <!-- Header -->
         <div class="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between bg-white/5">
           <h2 class="text-xl font-bold text-[var(--text-primary)]">
-            {{ event ? 'Editar Evento' : 'Nuevo Evento' }}
+            {{ event ? 'Edit Event' : 'New Event' }}
           </h2>
           <button (click)="onClose()" class="p-2 text-[var(--text-secondary)] hover:text-white transition-colors">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -34,30 +34,30 @@ import { finalize } from 'rxjs';
           
           <!-- Banner Upload -->
           <div class="space-y-2">
-            <label class="text-sm font-medium text-[var(--text-secondary)]">Banner del Evento</label>
+            <label class="text-sm font-medium text-[var(--text-secondary)]">Event Banner</label>
             <div 
-              class="relative h-40 w-full bg-[var(--bg-tertiary)] border-2 border-dashed border-[var(--border-color)] rounded-2xl overflow-hidden group transition-all hover:border-indigo-500/50"
-              [class.border-indigo-500]="isUploading()"
+              class="relative h-40 w-full bg-[var(--bg-tertiary)] border-2 border-dashed border-[var(--border-color)] rounded-2xl overflow-hidden group transition-all hover:border-blue-500/50"
+              [class.border-blue-500]="isUploading()"
             >
               @if (form.get('banner_url')?.value) {
                 <img [src]="form.get('banner_url')?.value" class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                   <button type="button" (click)="fileInput.click()" class="px-4 py-2 bg-white/20 backdrop-blur-md rounded-lg text-white text-sm font-medium">Cambiar Imagen</button>
+                   <button type="button" (click)="fileInput.click()" class="px-4 py-2 bg-white/20 backdrop-blur-md rounded-lg text-white text-sm font-medium">Change Image</button>
                 </div>
               } @else {
                 <div class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer" (click)="fileInput.click()">
                   <svg class="w-10 h-10 text-[var(--text-muted)] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <p class="text-xs text-[var(--text-muted)]">Click para subir banner (Recomendado 1200x400)</p>
+                  <p class="text-xs text-[var(--text-muted)]">Click to upload banner (Recommended 1200x400)</p>
                 </div>
               }
               
               @if (isUploading()) {
                 <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
                   <div class="flex flex-col items-center gap-3">
-                    <div class="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p class="text-xs text-white">Subiendo a la nube...</p>
+                    <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-xs text-white">Uploading...</p>
                   </div>
                 </div>
               }
@@ -68,56 +68,58 @@ import { finalize } from 'rxjs';
           <!-- Basic Info -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Título</label>
-              <input formControlName="title" type="text" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all" placeholder="Ej: Workshop de Angular 19">
+              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Title</label>
+              <input formControlName="title" type="text" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" placeholder="Ex: Angular 19 Workshop">
             </div>
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Tipo de Evento</label>
-              <select formControlName="event_type" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all">
+              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Event Type</label>
+              <select formControlName="event_type" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all">
                 <option value="virtual">Virtual</option>
-                <option value="in_person">Presencial</option>
-                <option value="hybrid">Híbrido</option>
+                <option value="in_person">In Person</option>
+                <option value="hybrid">Hybrid</option>
               </select>
             </div>
           </div>
 
           <!-- Description -->
           <div class="space-y-1.5">
-            <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Descripción</label>
-            <textarea formControlName="description" rows="3" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all resize-none" placeholder="Cuenta de qué trata el evento..."></textarea>
+            <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Description</label>
+            <textarea formControlName="description" rows="3" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all resize-none" placeholder="Tell what this event is about..."></textarea>
           </div>
 
           <!-- Dates -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Inicia el</label>
-              <input formControlName="starts_at" type="datetime-local" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all">
+              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Starts</label>
+              <input formControlName="starts_at" type="datetime-local" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all">
             </div>
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Termina el</label>
-              <input formControlName="ends_at" type="datetime-local" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all">
+              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Ends</label>
+              <input formControlName="ends_at" type="datetime-local" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all">
             </div>
           </div>
 
           <!-- Location / Link -->
           <div class="space-y-1.5">
             <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
-              {{ form.get('event_type')?.value === 'virtual' ? 'Link de la Reunión' : 'Ubicación' }}
+              {{ form.get('event_type')?.value === 'virtual' ? 'Meeting Link' : 'Location' }}
             </label>
-            <input [formControlName]="form.get('event_type')?.value === 'virtual' ? 'meeting_url' : 'location'" type="text" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all" [placeholder]="form.get('event_type')?.value === 'virtual' ? 'https://zoom.us/...' : 'Aula 302, Campus Jala'">
+            <input [formControlName]="form.get('event_type')?.value === 'virtual' ? 'meeting_url' : 'location'" type="text" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" [placeholder]="form.get('event_type')?.value === 'virtual' ? 'https://zoom.us/...' : 'Room 302, Campus Jala'">
           </div>
 
           <!-- Capacity & Status -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Capacidad Máxima</label>
-              <input formControlName="capacity" type="number" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all" placeholder="Ej: 50">
+              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Max Capacity</label>
+              <input formControlName="capacity" type="number" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" placeholder="Ex: 50">
             </div>
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Estado Inicial</label>
-              <select formControlName="status" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all">
-                <option value="draft">Borrador</option>
-                <option value="published">Publicar Ahora</option>
+              <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Status</label>
+              <select formControlName="status" class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all">
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="completed">Completed</option>
               </select>
             </div>
           </div>
@@ -126,14 +128,14 @@ import { finalize } from 'rxjs';
         <!-- Footer -->
         <div class="px-6 py-4 bg-white/5 border-t border-[var(--border-color)] flex items-center justify-end gap-3">
           <button (click)="onClose()" type="button" class="px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:text-white transition-colors">
-            Cancelar
+            Cancel
           </button>
           <button 
             [disabled]="form.invalid || isSaving() || isUploading()"
             (click)="onSubmit()"
-            class="px-8 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+            class="px-8 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all active:scale-95"
           >
-            {{ isSaving() ? 'Guardando...' : (event ? 'Guardar Cambios' : 'Crear Evento') }}
+            {{ isSaving() ? 'Saving...' : (event ? 'Save Changes' : 'Create Event') }}
           </button>
         </div>
       </div>

@@ -95,6 +95,6 @@ export class AuthService {
   public logout(): void {
     this.removeToken();
     this.currentUser.set(null);
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/events']);
   }
 }
