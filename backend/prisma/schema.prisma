@@ -55,10 +55,12 @@ model User {
   full_name  String     @db.VarChar(255)
   email      String     @unique @db.VarChar(255)
   avatar_url String?    @db.Text
-  provider  String     @default("google") // "google" or "microsoft"
-  role       GlobalRole @default(user)
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
+  provider      String     @default("google") // "google" or "microsoft"
+  refresh_token String?    @db.Text
+  access_token  String?    @db.Text
+  role          GlobalRole @default(user)
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
   registrations Registration[]
 

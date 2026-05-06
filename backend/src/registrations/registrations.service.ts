@@ -4,12 +4,17 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
+import { CalendarService } from '../events/calendar.service';
+import { UserEntity } from '@users/dto/user.interface';
 import { PrismaService } from '../prisma/prisma.service';
-import { Event, Registration, RegistrationStatus } from '@prisma/client';
+import { Registration, RegistrationStatus } from '@prisma/client';
 
 @Injectable()
 export class RegistrationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private calendarService: CalendarService,
+  ) {}
 
   async register(eventId: string, userId: string): Promise<Registration> {
     const event = await this.prisma.event.findUnique({
@@ -23,6 +28,13 @@ export class RegistrationsService {
       throw new BadRequestException('Cannot register to a non-published event');
     }
 
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     const existing = await this.prisma.registration.findUnique({
       where: {
         event_id_user_id: { event_id: eventId, user_id: userId },
@@ -33,13 +45,15 @@ export class RegistrationsService {
       throw new ConflictException('Already registered to this event');
     }
 
-    return this.prisma.registration.create({
+    const registration = await this.prisma.registration.create({
       data: {
         event_id: eventId,
         user_id: userId,
         status: RegistrationStatus.confirmed,
       },
     });
+
+    return registration;
   }
 
   async getRegistration(

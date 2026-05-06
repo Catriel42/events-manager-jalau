@@ -16,7 +16,7 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
       clientID: configService.get<string>('MICROSOFT_CLIENT_ID')!,
       clientSecret: configService.get<string>('MICROSOFT_CLIENT_SECRET')!,
       callbackURL: configService.get<string>('MICROSOFT_CALLBACK_URL')!,
-      scope: ['user.read'],
+      scope: ['user.read', 'Calendars.ReadWrite', 'offline_access'],
       tenant: configService.get<string>('MICROSOFT_TENANT_ID', 'common'),
     });
   }
@@ -45,6 +45,8 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
       fullName: displayName || 'Microsoft User',
       avatarUrl: undefined,
       provider: 'microsoft',
+      accessToken,
+      refreshToken,
     });
 
     done(null, user);

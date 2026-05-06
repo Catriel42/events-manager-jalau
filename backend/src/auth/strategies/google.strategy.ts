@@ -14,8 +14,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientID: configService.get<string>('GOOGLE_CLIENT_ID')!,
       clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET')!,
       callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL')!,
-      scope: ['email', 'profile'],
-    });
+      scope: [
+        'email',
+        'profile',
+        'https://www.googleapis.com/auth/calendar.events',
+      ],
+      accessType: 'offline',
+      prompt: 'consent',
+    } as any);
   }
 
   async validate(
@@ -35,6 +41,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       fullName: displayName,
       avatarUrl: photos?.[0]?.value,
       provider: 'google',
+      accessToken,
+      refreshToken,
     });
 
     done(null, user);

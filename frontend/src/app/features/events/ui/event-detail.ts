@@ -95,16 +95,16 @@ export class EventDetail {
     });
   }
 
-  addToGoogleCalendar() {
-    const event = this.event();
-    if (!event) return;
-    this.calendarService.addToGoogleCalendar(event);
-  }
+  isSyncing = signal<boolean>(false);
 
-  addToOutlookCalendar() {
-    const event = this.event();
-    if (!event) return;
-    this.calendarService.addToOutlookCalendar(event);
+  onSyncCalendar() {
+    const eventId = this.id();
+    this.isSyncing.set(true);
+    
+    this.calendarService.syncEventToCalendar(eventId).subscribe({
+      next: () => this.isSyncing.set(false),
+      error: () => this.isSyncing.set(false)
+    });
   }
 
   getUserProvider(): string {

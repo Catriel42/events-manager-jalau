@@ -15,12 +15,16 @@ export class UsersService {
         full_name: data.fullName,
         avatar_url: data.avatarUrl,
         ...(data.provider && { provider: data.provider }),
+        ...(data.accessToken && { access_token: data.accessToken }),
+        ...(data.refreshToken && { refresh_token: data.refreshToken }),
       },
       create: {
         email: data.email,
         full_name: data.fullName,
         avatar_url: data.avatarUrl,
         provider: data.provider || 'google',
+        access_token: data.accessToken,
+        refresh_token: data.refreshToken,
         role: isFirstUser ? 'admin' : 'user',
       },
     });

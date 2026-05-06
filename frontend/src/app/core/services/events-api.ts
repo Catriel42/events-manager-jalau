@@ -39,6 +39,10 @@ export class EventsApi {
     return this.http.put<Event>(`${this.baseUrl}/${id}`, event);
   }
 
+  syncCalendar(id: string): Observable<{ url: string }> {
+    return this.http.post<{ url: string }>(`${this.baseUrl}/${id}/sync-calendar`, {});
+  }
+
   deleteEvent(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
