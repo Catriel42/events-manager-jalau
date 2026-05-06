@@ -9,12 +9,14 @@ export interface UserProfile {
   full_name: string;
   email: string;
   avatar_url: string | null;
+  provider: string;
   role: string;
 }@Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly TOKEN_KEY = 'token';
+  private readonly PENDING_EVENT_KEY = 'pendingEventId';
 
   private tokenSignal = signal<string | null>(this.getTokenFromStorage());
 
@@ -89,12 +91,28 @@ export class AuthService {
     );
   }
 
-  /**
-   * Logs out the user and redirects to login.
-   */
+/**
+    * Logs out the user and redirects to login.
+    */
   public logout(): void {
     this.removeToken();
     this.currentUser.set(null);
     this.router.navigate(['/events']);
+  }
+
+  /**
+   * Saves the event ID to redirect after login.
+   */
+  public setPendingEventId(eventId: string): void {
+    localStorage.setItem(this.PENDING_EVENT_KEY, eventId);
+  }
+
+  /**
+   * Gets and clears the pending event ID.
+   */
+  public getAndClearPendingEventId(): string | null {
+    const eventId = localStorage.getItem(this.PENDING_EVENT_KEY);
+    localStorage.removeItem(this.PENDING_EVENT_KEY);
+    return eventId;
   }
 }

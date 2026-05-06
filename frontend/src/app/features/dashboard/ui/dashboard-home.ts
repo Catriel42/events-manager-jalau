@@ -1,6 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { EventsApi } from '@core/services/events-api';
 import { Event } from '@shared/types/event.types';
 import { EventFormModal } from './event-form-modal';
@@ -8,7 +7,7 @@ import { EventFormModal } from './event-form-modal';
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, EventFormModal],
+  imports: [CommonModule, EventFormModal],
   template: `
     <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700 my-8 md:my-12">
       <!-- Header Section -->
@@ -17,8 +16,8 @@ import { EventFormModal } from './event-form-modal';
           <h1 class="text-3xl font-bold text-[var(--text-primary)] tracking-tight">Event Management</h1>
           <p class="text-[var(--text-secondary)] mt-1">Create, manage and oversee all platform events.</p>
         </div>
-        
-        <button 
+
+        <button
           (click)="openCreateModal()"
           class="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-blue-500/25 active:scale-95"
         >
@@ -97,7 +96,7 @@ import { EventFormModal } from './event-form-modal';
                       <p class="text-xs text-[var(--text-secondary)]">{{ event.starts_at | date:'shortTime' }}</p>
                     </td>
                     <td class="px-6 py-4">
-                      <span 
+                      <span
                         class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full"
                         [ngClass]="{
                           'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': event.status === 'published',
@@ -159,7 +158,7 @@ import { EventFormModal } from './event-form-modal';
                   <h3 class="text-[var(--text-primary)] font-medium truncate">{{ event.title }}</h3>
                   <p class="text-xs text-[var(--text-secondary)] capitalize mt-1">{{ event.event_type }}</p>
                   <p class="text-xs text-[var(--text-secondary)] mt-1">{{ event.starts_at | date:'mediumDate' }} • {{ event.starts_at | date:'shortTime' }}</p>
-                  <span 
+                  <span
                     class="inline-block mt-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full"
                     [ngClass]="{
                       'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': event.status === 'published',
@@ -194,8 +193,8 @@ import { EventFormModal } from './event-form-modal';
 
       <!-- Modal Component -->
       @if (isModalOpen()) {
-        <app-event-form-modal 
-          [event]="selectedEvent()" 
+        <app-event-form-modal
+          [event]="selectedEvent()"
           (close)="isModalOpen.set(false)"
           (saved)="loadEvents()"
         ></app-event-form-modal>

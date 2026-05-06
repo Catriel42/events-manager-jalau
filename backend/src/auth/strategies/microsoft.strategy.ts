@@ -44,6 +44,7 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
       email,
       fullName: displayName || 'Microsoft User',
       avatarUrl: undefined,
+      provider: 'microsoft',
     });
 
     done(null, user);

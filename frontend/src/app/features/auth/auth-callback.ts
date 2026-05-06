@@ -20,7 +20,7 @@ import { AuthService } from '@core/services/auth.service';
     :host {
       display: block;
       min-height: 100vh;
-      background-color: #0b1120; /* Deep Jala Navy Background */
+      background-color: #0b1120;
       font-family: 'Outfit', sans-serif;
       color: #f8fafc;
     }
@@ -43,8 +43,8 @@ import { AuthService } from '@core/services/auth.service';
       width: 60px;
       height: 60px;
       border: 4px solid rgba(255, 255, 255, 0.1);
-      border-left-color: #06b6d4; /* Jala Cyan */
-      border-right-color: #3b82f6; /* Jala Royal Blue */
+      border-left-color: #06b6d4;
+      border-right-color: #3b82f6;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin-bottom: 2rem;
@@ -81,8 +81,13 @@ export class AuthCallback implements OnInit {
 
       if (token) {
         this.authService.setToken(token);
+        
+        const pendingEventId = this.authService.getAndClearPendingEventId();
+        
         if (this.authService.isAdmin()) {
           this.router.navigate(['/dashboard']);
+        } else if (pendingEventId) {
+          this.router.navigate(['/events', pendingEventId]);
         } else {
           this.router.navigate(['/events']);
         }

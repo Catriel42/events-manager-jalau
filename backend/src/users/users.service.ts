@@ -14,11 +14,13 @@ export class UsersService {
       update: {
         full_name: data.fullName,
         avatar_url: data.avatarUrl,
+        ...(data.provider && { provider: data.provider }),
       },
       create: {
         email: data.email,
         full_name: data.fullName,
         avatar_url: data.avatarUrl,
+        provider: data.provider || 'google',
         role: isFirstUser ? 'admin' : 'user',
       },
     });

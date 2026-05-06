@@ -4,6 +4,14 @@ import { Observable } from 'rxjs';
 import { Event, PaginatedResponse } from '@shared/types/event.types';
 import { environment } from '@env/environment';
 
+export interface Registration {
+  id: string;
+  event_id: string;
+  user_id: string;
+  status: 'confirmed' | 'waitlisted' | 'cancelled';
+  registered_at: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class EventsApi {
   private http = inject(HttpClient);
@@ -33,5 +41,17 @@ export class EventsApi {
 
   deleteEvent(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  registerToEvent(eventId: string): Observable<Registration> {
+    return this.http.post<Registration>(`${this.baseUrl}/${eventId}/registrations`, {});
+  }
+
+  getMyRegistration(eventId: string): Observable<Registration | null> {
+    return this.http.get<Registration | null>(`${this.baseUrl}/${eventId}/registrations`);
+  }
+
+  unregisterFromEvent(eventId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${eventId}/registrations`);
   }
 }
