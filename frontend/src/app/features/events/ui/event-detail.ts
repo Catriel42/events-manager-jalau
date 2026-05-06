@@ -16,14 +16,14 @@ export class EventDetail {
   private eventsApi = inject(EventsApi);
   private injector = inject(Injector);
 
-  eventId = input.required<string>();
+  id = input.required<string>();
 
   event = signal<Event | null>(null);
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
 
   constructor() {
-    toObservable(this.eventId, { injector: this.injector }).pipe(
+    toObservable(this.id, { injector: this.injector }).pipe(
       tap(() => {
         this.isLoading.set(true);
         this.error.set(null);
