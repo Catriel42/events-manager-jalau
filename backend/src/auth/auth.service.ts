@@ -12,12 +12,6 @@ export class AuthService {
   ) {}
 
   async validateOAuthUser(userData: UpsertUserDto) {
-    if (!userData.email.endsWith('@jala.university')) {
-      throw new UnauthorizedException(
-        'Access denied: Only Jala University accounts are allowed.',
-      );
-    }
-
     const user = await this.usersService.upsertByEmail(userData);
 
     const payload: AuthPayload = {
