@@ -3,11 +3,12 @@
     <div class="flex items-center justify-between h-20">
 <!-- Logo -->
       <a routerLink="/events" class="flex items-center gap-3 no-underline">
+        <span class="sr-only">event-manager-jalau</span>
         @if (themeService.theme() === 'dark') {
-          <img src="/logo-dark.svg" alt="" class="w-40 h-40">
-          } @else {
-            <img src="/logo-light.svg" alt="" class="w-40 max-h-40">
-          }
+          <img src="/logo-dark.svg" alt="event-manager-jalau" class="w-40 h-40">
+        } @else {
+          <img src="/logo-light.svg" alt="event-manager-jalau" class="w-40 max-h-40">
+        }
       </a>
 
       <!-- Actions -->
