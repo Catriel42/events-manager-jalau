@@ -32,6 +32,20 @@ export const routes: Routes = [
       import('./features/cancel/ui/cancel-page').then((m) => m.CancelPage),
   },
   {
+    path: 'privacy',
+    loadComponent: () =>
+      import('./features/legal/privacy/privacy.component').then(
+        (m) => m.PrivacyComponent,
+      ),
+  },
+  {
+    path: 'terms',
+    loadComponent: () =>
+      import('./features/legal/terms/terms.component').then(
+        (m) => m.TermsComponent,
+      ),
+  },
+  {
     path: '**',
     redirectTo: 'events',
   },
