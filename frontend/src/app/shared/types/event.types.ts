@@ -18,6 +18,7 @@ export interface Event {
   starts_at: string;
   ends_at: string;
   capacity?: number;
+  registered_count?: number;
   banner_url?: string;
   calendar_uid: string;
   created_at: string;

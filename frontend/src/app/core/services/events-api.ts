@@ -9,6 +9,7 @@ export interface Registration {
   event_id: string;
   user_id: string;
   status: 'confirmed' | 'waitlisted' | 'cancelled';
+  waitlist_position?: number | null;
   registered_at: string;
 }
 
@@ -17,6 +18,7 @@ export interface RegistrationWithUser {
   event_id: string;
   user_id: string;
   status: 'confirmed' | 'waitlisted' | 'cancelled';
+  waitlist_position?: number | null;
   registered_at: string;
   user: {
     id: string;
