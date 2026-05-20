@@ -162,7 +162,12 @@ export class RegistrationsService {
 
   async getEventRegistrations(eventId: string) {
     return this.prisma.registration.findMany({
-      where: { event_id: eventId, status: RegistrationStatus.confirmed },
+      where: {
+        event_id: eventId,
+        status: {
+          in: [RegistrationStatus.confirmed, RegistrationStatus.waitlisted],
+        },
+      },
       include: {
         user: {
           select: {
