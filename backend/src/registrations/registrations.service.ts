@@ -77,6 +77,18 @@ export class RegistrationsService {
       throw new NotFoundException('Registration not found');
     }
 
+    if (registration.calendar_event_id) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (user) {
+        await this.calendarService.deleteEventFromUserCalendar(
+          user,
+          registration.calendar_event_id,
+        );
+      }
+    }
+
     await this.prisma.registration.delete({
       where: { id: registration.id },
     });

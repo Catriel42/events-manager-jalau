@@ -2,10 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
+import { CalendarService } from './calendar.service';
 
 @Injectable()
 export class EventsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private calendarService: CalendarService,
+  ) {}
 
   async findAll(page = 1, limit = 10, includeAll = false) {
     const skip = (page - 1) * limit;
@@ -140,6 +144,32 @@ export class EventsService {
         },
       },
     });
+
+    // Find all registrations with a synced calendar event
+    const syncedRegistrations = await this.prisma.registration.findMany({
+      where: {
+        event_id: id,
+        calendar_event_id: { not: null },
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (syncedRegistrations.length > 0) {
+      // Background promise call to prevent blocking request
+      Promise.allSettled(
+        syncedRegistrations.map((reg) =>
+          this.calendarService.updateEventInUserCalendar(
+            reg.user,
+            event,
+            reg.calendar_event_id!,
+          ),
+        ),
+      ).catch((err) => {
+        console.error('Failed to sync updated event to user calendars:', err);
+      });
+    }
 
     return {
       ...event,
