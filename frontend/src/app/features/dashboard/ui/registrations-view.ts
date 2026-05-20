@@ -227,66 +227,113 @@ import { Event } from '@shared/types/event.types';
                         <p class="text-sm text-[var(--text-secondary)]">Loading attendees...</p>
                       </div>
                     } @else {
-                      <div class="space-y-4">
+                      <div class="space-y-6">
                         <p class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
                           Attendees ({{ confirmedCount() }} Confirmed, {{ waitlistCount() }} Waitlisted)
                         </p>
                         
-                        <div class="divide-y divide-[var(--border-color)]">
-                          @for (reg of filteredAttendees(); track reg.id) {
-                            <div class="py-4 flex items-center justify-between gap-4 group">
-                              <div class="flex items-center gap-3 min-w-0">
-                                @if (reg.user.avatar_url) {
-                                  <img [src]="reg.user.avatar_url" class="w-10 h-10 rounded-full object-cover border border-white/10 shrink-0">
-                                } @else {
-                                  <div class="w-10 h-10 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-sm shrink-0 border border-blue-500/20">
-                                    {{ getInitials(reg.user.full_name) }}
-                                  </div>
-                                }
-                                <div class="min-w-0">
-                                  <div class="flex items-center gap-2">
-                                    <h4 class="text-sm font-semibold text-[var(--text-primary)] truncate">
-                                      {{ reg.user.full_name }}
-                                    </h4>
-                                    <span
-                                      class="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full shrink-0"
-                                      [ngClass]="{
-                                        'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': reg.status === 'confirmed',
-                                        'bg-amber-500/10 text-amber-400 border border-amber-500/20': reg.status === 'waitlisted'
-                                      }"
-                                    >
-                                      {{ reg.status === 'confirmed' ? 'Confirmed' : 'Waitlist #' + reg.waitlist_position }}
-                                    </span>
-                                  </div>
-                                  <p class="text-xs text-[var(--text-secondary)] truncate">
-                                    {{ reg.user.email }}
-                                  </p>
-                                  <p class="text-[10px] text-[var(--text-secondary)]/70 mt-0.5">
-                                    Registered on {{ reg.registered_at | date:'mediumDate' }}
-                                  </p>
-                                </div>
-                              </div>
+                        @if (filteredAttendees().length === 0) {
+                          <div class="text-center py-12 text-[var(--text-secondary)]">
+                            No attendees found.
+                          </div>
+                        } @else {
+                          <!-- Confirmed Attendees Section -->
+                          @if (confirmedAttendees().length > 0) {
+                            <div class="space-y-2">
+                              <p class="text-xs font-bold tracking-wider text-emerald-400">
+                                CONFIRMED
+                              </p>
+                              <div class="divide-y divide-[var(--border-color)]">
+                                @for (reg of confirmedAttendees(); track reg.id) {
+                                  <div class="py-3 flex items-center justify-between gap-4 group">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                      @if (reg.user.avatar_url) {
+                                        <img [src]="reg.user.avatar_url" class="w-9 h-9 rounded-full object-cover border border-white/10 shrink-0">
+                                      } @else {
+                                        <div class="w-9 h-9 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0 border border-blue-500/20">
+                                          {{ getInitials(reg.user.full_name) }}
+                                        </div>
+                                      }
+                                      <div class="min-w-0">
+                                        <h4 class="text-sm font-semibold text-[var(--text-primary)] truncate">
+                                          {{ reg.user.full_name }}
+                                        </h4>
+                                        <p class="text-xs text-[var(--text-secondary)] truncate">
+                                          {{ reg.user.email }}
+                                        </p>
+                                      </div>
+                                    </div>
 
-                              <button
-                                (click)="copyEmail(reg.user.email)"
-                                class="p-1.5 text-[var(--text-secondary)] hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors shrink-0"
-                                [title]="copiedEmail() === reg.user.email ? 'Copied!' : 'Copy Email'"
-                              >
-                                @if (copiedEmail() === reg.user.email) {
-                                  <span class="text-xs text-blue-400 font-semibold px-1">Copied!</span>
-                                } @else {
-                                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                                  </svg>
+                                    <button
+                                      (click)="copyEmail(reg.user.email)"
+                                      class="p-1.5 text-[var(--text-secondary)] hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors shrink-0"
+                                      [title]="copiedEmail() === reg.user.email ? 'Copied!' : 'Copy Email'"
+                                    >
+                                      @if (copiedEmail() === reg.user.email) {
+                                        <span class="text-xs text-blue-400 font-semibold px-1">Copied!</span>
+                                      } @else {
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                        </svg>
+                                      }
+                                    </button>
+                                  </div>
                                 }
-                              </button>
-                            </div>
-                          } @empty {
-                            <div class="text-center py-12 text-[var(--text-secondary)]">
-                              No attendees found.
+                              </div>
                             </div>
                           }
-                        </div>
+
+                          <!-- Waitlisted Attendees Section -->
+                          @if (waitlistedAttendees().length > 0) {
+                            <div class="space-y-2 mt-6">
+                              <p class="text-xs font-bold tracking-wider text-amber-400">
+                                WAITLIST (IN ORDER)
+                              </p>
+                              <div class="divide-y divide-[var(--border-color)]">
+                                @for (reg of waitlistedAttendees(); track reg.id) {
+                                  <div class="py-3 flex items-center justify-between gap-4 group">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                      @if (reg.user.avatar_url) {
+                                        <img [src]="reg.user.avatar_url" class="w-9 h-9 rounded-full object-cover border border-white/10 shrink-0">
+                                      } @else {
+                                        <div class="w-9 h-9 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0 border border-blue-500/20">
+                                          {{ getInitials(reg.user.full_name) }}
+                                        </div>
+                                      }
+                                      <div class="min-w-0">
+                                        <div class="flex items-center gap-2">
+                                          <h4 class="text-sm font-semibold text-[var(--text-primary)] truncate">
+                                            {{ reg.user.full_name }}
+                                          </h4>
+                                          <span class="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+                                            Pos #{{ reg.waitlist_position }}
+                                          </span>
+                                        </div>
+                                        <p class="text-xs text-[var(--text-secondary)] truncate">
+                                          {{ reg.user.email }}
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    <button
+                                      (click)="copyEmail(reg.user.email)"
+                                      class="p-1.5 text-[var(--text-secondary)] hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors shrink-0"
+                                      [title]="copiedEmail() === reg.user.email ? 'Copied!' : 'Copy Email'"
+                                    >
+                                      @if (copiedEmail() === reg.user.email) {
+                                        <span class="text-xs text-blue-400 font-semibold px-1">Copied!</span>
+                                      } @else {
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                        </svg>
+                                      }
+                                    </button>
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                          }
+                        }
                       </div>
                     }
                   </div>
@@ -332,6 +379,16 @@ export class RegistrationsView implements OnInit {
 
   waitlistCount = computed(() => {
     return this.filteredAttendees().filter(reg => reg.status === 'waitlisted').length;
+  });
+
+  confirmedAttendees = computed(() => {
+    return this.filteredAttendees().filter((reg) => reg.status === 'confirmed');
+  });
+
+  waitlistedAttendees = computed(() => {
+    return this.filteredAttendees()
+      .filter((reg) => reg.status === 'waitlisted')
+      .sort((a, b) => (a.waitlist_position || 0) - (b.waitlist_position || 0));
   });
 
   ngOnInit() {
