@@ -27,6 +27,7 @@ export class EventDetail {
   registration = signal<Registration | null>(null);
   isLoading = signal<boolean>(true);
   isRegistering = signal<boolean>(false);
+  isUnregistering = signal<boolean>(false);
   error = signal<string | null>(null);
 
   constructor() {
@@ -82,15 +83,15 @@ export class EventDetail {
 
   onUnregister() {
     const eventId = this.id();
-    this.isRegistering.set(true);
+    this.isUnregistering.set(true);
 
     this.eventsApi.unregisterFromEvent(eventId).subscribe({
       next: () => {
         this.registration.set(null);
-        this.isRegistering.set(false);
+        this.isUnregistering.set(false);
       },
       error: () => {
-        this.isRegistering.set(false);
+        this.isUnregistering.set(false);
       }
     });
   }

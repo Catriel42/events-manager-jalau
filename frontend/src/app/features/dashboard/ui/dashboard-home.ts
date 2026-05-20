@@ -214,11 +214,16 @@ import { EventFormModal } from './event-form-modal';
               <h3 class="text-xl font-bold text-[var(--text-primary)] mb-2">Delete Event</h3>
               <p class="text-[var(--text-secondary)] mb-6">Are you sure you want to delete "<span class="text-[var(--text-primary)] font-medium">{{ eventToDelete()?.title }}</span>"? This action cannot be undone.</p>
               <div class="flex gap-3">
-                <button (click)="isDeleteModalOpen.set(false)" class="flex-1 px-4 py-2.5 bg-[var(--bg-tertiary)] hover:bg-[var(--bg-tertiary)]/80 text-[var(--text-primary)] font-medium rounded-xl transition-colors">
+                <button (click)="isDeleteModalOpen.set(false)" [disabled]="isDeleting()" class="flex-1 px-4 py-2.5 bg-[var(--bg-tertiary)] hover:bg-[var(--bg-tertiary)]/80 text-[var(--text-primary)] font-medium rounded-xl transition-colors disabled:opacity-50">
                   Cancel
                 </button>
-                <button (click)="confirmDelete()" class="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white font-medium rounded-xl transition-colors">
-                  Delete
+                <button (click)="confirmDelete()" [disabled]="isDeleting()" class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white font-medium rounded-xl transition-colors disabled:opacity-50">
+                  @if (isDeleting()) {
+                    <div class="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                    Deleting...
+                  } @else {
+                    Delete
+                  }
                 </button>
               </div>
             </div>
@@ -237,6 +242,7 @@ export class DashboardHome implements OnInit {
   selectedEvent = signal<Event | null>(null);
   isDeleteModalOpen = signal(false);
   eventToDelete = signal<Event | null>(null);
+  isDeleting = signal(false);
 
   stats = signal([
     { label: 'Total Events', value: '0' },
@@ -288,10 +294,17 @@ export class DashboardHome implements OnInit {
   confirmDelete() {
     const event = this.eventToDelete();
     if (event) {
-      this.eventsApi.deleteEvent(event.id).subscribe(() => {
-        this.loadEvents();
-        this.isDeleteModalOpen.set(false);
-        this.eventToDelete.set(null);
+      this.isDeleting.set(true);
+      this.eventsApi.deleteEvent(event.id).subscribe({
+        next: () => {
+          this.loadEvents();
+          this.isDeleteModalOpen.set(false);
+          this.eventToDelete.set(null);
+          this.isDeleting.set(false);
+        },
+        error: () => {
+          this.isDeleting.set(false);
+        }
       });
     }
   }

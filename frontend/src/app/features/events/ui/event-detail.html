@@ -178,8 +178,13 @@
                 }
               </div>
             </div>
-            <button (click)="onUnregister()" class="mt-4 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl transition-colors text-sm">
-              Cancel registration
+            <button (click)="onUnregister()" [disabled]="isUnregistering()" class="mt-4 flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl transition-colors text-sm disabled:opacity-50">
+              @if (isUnregistering()) {
+                <div class="w-4 h-4 border-2 border-red-400/20 border-t-red-400 rounded-full animate-spin"></div>
+                Cancelling...
+              } @else {
+                Cancel registration
+              }
             </button>
           } @else {
             <!-- Not Registered -->
