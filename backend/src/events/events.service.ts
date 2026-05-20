@@ -64,9 +64,14 @@ export class EventsService {
       throw new NotFoundException('Event not found');
     }
 
+    const confirmedCount = await this.prisma.registration.count({
+      where: { event_id: id, status: 'confirmed' },
+    });
+
     return {
       ...event,
       tags: event.tags.map((et) => et.tag),
+      registered_count: confirmedCount,
     };
   }
 

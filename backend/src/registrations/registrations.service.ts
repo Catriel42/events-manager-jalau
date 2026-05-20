@@ -44,11 +44,30 @@ export class RegistrationsService {
       throw new ConflictException('Already registered to this event');
     }
 
+    let status: RegistrationStatus = RegistrationStatus.confirmed;
+    let waitlistPosition: number | null = null;
+
+    if (event.capacity !== null && event.capacity > 0) {
+      const confirmedCount = await this.prisma.registration.count({
+        where: { event_id: eventId, status: RegistrationStatus.confirmed },
+      });
+
+      if (confirmedCount >= event.capacity) {
+        status = RegistrationStatus.waitlisted;
+        const lastWaitlist = await this.prisma.registration.findFirst({
+          where: { event_id: eventId, status: RegistrationStatus.waitlisted },
+          orderBy: { waitlist_position: 'desc' },
+        });
+        waitlistPosition = lastWaitlist && lastWaitlist.waitlist_position ? lastWaitlist.waitlist_position + 1 : 1;
+      }
+    }
+
     const registration = await this.prisma.registration.create({
       data: {
         event_id: eventId,
         user_id: userId,
-        status: RegistrationStatus.confirmed,
+        status,
+        waitlist_position: waitlistPosition,
       },
     });
 
@@ -92,6 +111,53 @@ export class RegistrationsService {
     await this.prisma.registration.delete({
       where: { id: registration.id },
     });
+
+    if (registration.status === RegistrationStatus.confirmed) {
+      const nextInLine = await this.prisma.registration.findFirst({
+        where: { event_id: eventId, status: RegistrationStatus.waitlisted },
+        orderBy: { waitlist_position: 'asc' },
+      });
+
+      if (nextInLine) {
+        // Promote next user in line
+        await this.prisma.registration.update({
+          where: { id: nextInLine.id },
+          data: {
+            status: RegistrationStatus.confirmed,
+            waitlist_position: null,
+          },
+        });
+
+        // Decrement waitlist positions for all other waitlisted users of this event
+        await this.prisma.registration.updateMany({
+          where: {
+            event_id: eventId,
+            status: RegistrationStatus.waitlisted,
+          },
+          data: {
+            waitlist_position: {
+              decrement: 1,
+            },
+          },
+        });
+      }
+    } else if (registration.status === RegistrationStatus.waitlisted && registration.waitlist_position !== null) {
+      // If we cancelled a waitlisted registration, we shift positions of everyone after them
+      await this.prisma.registration.updateMany({
+        where: {
+          event_id: eventId,
+          status: RegistrationStatus.waitlisted,
+          waitlist_position: {
+            gt: registration.waitlist_position,
+          },
+        },
+        data: {
+          waitlist_position: {
+            decrement: 1,
+          },
+        },
+      });
+    }
   }
 
   async getEventRegistrations(eventId: string) {
