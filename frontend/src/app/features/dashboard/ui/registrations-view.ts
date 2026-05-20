@@ -229,7 +229,7 @@ import { Event } from '@shared/types/event.types';
                     } @else {
                       <div class="space-y-4">
                         <p class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                          Confirmed ({{ filteredAttendees().length }})
+                          Attendees ({{ confirmedCount() }} Confirmed, {{ waitlistCount() }} Waitlisted)
                         </p>
                         
                         <div class="divide-y divide-[var(--border-color)]">
@@ -244,9 +244,20 @@ import { Event } from '@shared/types/event.types';
                                   </div>
                                 }
                                 <div class="min-w-0">
-                                  <h4 class="text-sm font-semibold text-[var(--text-primary)] truncate">
-                                    {{ reg.user.full_name }}
-                                  </h4>
+                                  <div class="flex items-center gap-2">
+                                    <h4 class="text-sm font-semibold text-[var(--text-primary)] truncate">
+                                      {{ reg.user.full_name }}
+                                    </h4>
+                                    <span
+                                      class="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full shrink-0"
+                                      [ngClass]="{
+                                        'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': reg.status === 'confirmed',
+                                        'bg-amber-500/10 text-amber-400 border border-amber-500/20': reg.status === 'waitlisted'
+                                      }"
+                                    >
+                                      {{ reg.status === 'confirmed' ? 'Confirmed' : 'Waitlist #' + reg.waitlist_position }}
+                                    </span>
+                                  </div>
                                   <p class="text-xs text-[var(--text-secondary)] truncate">
                                     {{ reg.user.email }}
                                   </p>
@@ -313,6 +324,14 @@ export class RegistrationsView implements OnInit {
         reg.user.full_name.toLowerCase().includes(query) ||
         reg.user.email.toLowerCase().includes(query)
     );
+  });
+
+  confirmedCount = computed(() => {
+    return this.filteredAttendees().filter(reg => reg.status === 'confirmed').length;
+  });
+
+  waitlistCount = computed(() => {
+    return this.filteredAttendees().filter(reg => reg.status === 'waitlisted').length;
   });
 
   ngOnInit() {
