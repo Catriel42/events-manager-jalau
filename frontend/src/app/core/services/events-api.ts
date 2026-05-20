@@ -12,6 +12,20 @@ export interface Registration {
   registered_at: string;
 }
 
+export interface RegistrationWithUser {
+  id: string;
+  event_id: string;
+  user_id: string;
+  status: 'confirmed' | 'waitlisted' | 'cancelled';
+  registered_at: string;
+  user: {
+    id: string;
+    full_name: string;
+    email: string;
+    avatar_url: string | null;
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class EventsApi {
   private http = inject(HttpClient);
@@ -57,5 +71,9 @@ export class EventsApi {
 
   unregisterFromEvent(eventId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${eventId}/registrations`);
+  }
+
+  getEventRegistrations(eventId: string): Observable<RegistrationWithUser[]> {
+    return this.http.get<RegistrationWithUser[]>(`${this.baseUrl}/${eventId}/registrations/all`);
   }
 }
