@@ -1,8 +1,42 @@
 import { Module } from '@nestjs/common';
+import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { HandlebarsAdapter } = require('@nestjs-modules/mailer/dist/adapters/handlebars.adapter') as {
+  HandlebarsAdapter: new () => MailerOptions['template'] extends { adapter?: infer A } ? NonNullable<A> : never;
+};
+import { ConfigService } from '@nestjs/config';
+import { join } from 'path';
 import { NotificationsService } from './notifications.service';
+import { EventReminderTask } from './event-reminder.task';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  providers: [NotificationsService],
+  imports: [
+    PrismaModule,
+    MailerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        transport: {
+          host: config.get<string>('MAIL_HOST'),
+          port: config.get<number>('MAIL_PORT'),
+          secure: false, // true for port 465, false for 587
+          auth: {
+            user: config.get<string>('MAIL_USER'),
+            pass: config.get<string>('MAIL_PASS'),
+          },
+        },
+        defaults: {
+          from: config.get<string>('MAIL_FROM'),
+        },
+        template: {
+          dir: join(__dirname, 'templates'),
+          adapter: new HandlebarsAdapter(),
+          options: { strict: true },
+        },
+      }),
+    }),
+  ],
+  providers: [NotificationsService, EventReminderTask],
   exports: [NotificationsService],
 })
 export class NotificationsModule {}

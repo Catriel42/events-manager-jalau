@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { CalendarService } from '../events/calendar.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { Registration, RegistrationStatus } from '@prisma/client';
 
 @Injectable()
@@ -13,6 +14,7 @@ export class RegistrationsService {
   constructor(
     private prisma: PrismaService,
     private calendarService: CalendarService,
+    private notifications: NotificationsService,
   ) {}
 
   async register(eventId: string, userId: string): Promise<Registration> {
@@ -73,6 +75,14 @@ export class RegistrationsService {
         waitlist_position: waitlistPosition,
       },
     });
+
+    // Fire-and-forget: send confirmation email (does not block the response)
+    void this.notifications.sendRegistrationConfirmation(
+      user,
+      event,
+      registration.id,
+      waitlistPosition ?? undefined,
+    );
 
     return registration;
   }

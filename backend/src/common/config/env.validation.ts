@@ -69,6 +69,27 @@ export class EnvironmentVariables {
   @IsString()
   @IsOptional()
   CLOUDINARY_API_SECRET?: string;
+
+  @IsString()
+  @IsOptional()
+  MAIL_HOST?: string;
+
+  @IsNumber()
+  @Type(() => Number)
+  @IsOptional()
+  MAIL_PORT: number = 587;
+
+  @IsString()
+  @IsOptional()
+  MAIL_USER?: string;
+
+  @IsString()
+  @IsOptional()
+  MAIL_PASS?: string;
+
+  @IsString()
+  @IsOptional()
+  MAIL_FROM: string = 'Events Manager <noreply@example.com>';
 }
 
 export function validate(config: Record<string, unknown>) {

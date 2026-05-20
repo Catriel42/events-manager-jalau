@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Event Reminder</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 0;">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <!-- Header -->
+          <tr>
+            <td style="background:#1e1b4b;padding:32px 40px;text-align:center;">
+              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;">Events Manager</h1>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="padding:40px;">
+              {{#if isOneHour}}
+                <h2 style="margin:0 0 8px;color:#1e1b4b;font-size:20px;">⏰ Starting in 1 hour!</h2>
+                <p style="color:#6b7280;font-size:15px;margin:0 0 24px;">
+                  Hi <strong>{{name}}</strong>, just a quick reminder — <strong>{{eventTitle}}</strong> starts in about <strong>1 hour</strong>. Get ready!
+                </p>
+              {{else}}
+                <h2 style="margin:0 0 8px;color:#1e1b4b;font-size:20px;">📅 Happening tomorrow!</h2>
+                <p style="color:#6b7280;font-size:15px;margin:0 0 24px;">
+                  Hi <strong>{{name}}</strong>, this is a reminder that <strong>{{eventTitle}}</strong> is <strong>tomorrow</strong>. Don't forget!
+                </p>
+              {{/if}}
+
+              <!-- Event details card -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;">
+                <tr>
+                  <td style="padding:24px;">
+                    <p style="margin:0 0 12px;font-size:13px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Event Details</p>
+                    <p style="margin:0 0 8px;font-size:15px;color:#111827;"><strong>📅 Date:</strong> {{eventDate}}</p>
+                    <p style="margin:0 0 8px;font-size:15px;color:#111827;"><strong>🕐 Time:</strong> {{eventTime}}</p>
+                    {{#if isVirtual}}
+                      <p style="margin:0;font-size:15px;color:#111827;"><strong>🔗 Link:</strong> <a href="{{location}}" style="color:#4f46e5;">{{location}}</a></p>
+                    {{else}}
+                      <p style="margin:0;font-size:15px;color:#111827;"><strong>📍 Location:</strong> {{location}}</p>
+                    {{/if}}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding:24px 40px;border-top:1px solid #f3f4f6;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#9ca3af;">You received this email because you are registered for this event.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
