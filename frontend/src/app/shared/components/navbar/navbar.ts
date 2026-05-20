@@ -9,7 +9,10 @@ import { ThemeService } from '@core/services/theme.service';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css'
+  styleUrl: './navbar.css',
+  host: {
+    class: 'block sticky top-0 z-50'
+  }
 })
 export class Navbar {
   public authService = inject(AuthService);

@@ -7,15 +7,15 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="max-w-4xl mx-auto my-12 p-8 bg-[var(--bg-glass)] border border-[var(--border-color)] rounded-2xl backdrop-blur-xl">
-      <a routerLink="/" class="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mb-8">
+    <div class="max-w-4xl mx-4 md:mx-auto my-6 md:my-12 p-6 md:p-10 bg-[var(--bg-glass)] border border-[var(--border-color)] rounded-2xl backdrop-blur-xl">
+      <a routerLink="/" class="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mb-6 md:mb-8">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
         Back to Home
       </a>
 
-      <h1 class="text-4xl font-bold text-[var(--text-primary)] mb-8">Privacy Policy</h1>
+      <h1 class="text-2xl md:text-4xl font-bold text-[var(--text-primary)] mb-6 md:mb-8">Privacy Policy</h1>
       
       <div class="space-y-6 text-[var(--text-secondary)] leading-relaxed">
         <section>
