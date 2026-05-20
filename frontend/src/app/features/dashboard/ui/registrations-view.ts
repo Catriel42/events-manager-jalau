@@ -240,8 +240,8 @@ import { Event } from '@shared/types/event.types';
                           <!-- Confirmed Attendees Section -->
                           @if (confirmedAttendees().length > 0) {
                             <div class="space-y-2">
-                              <p class="text-xs font-bold tracking-wider text-emerald-400">
-                                CONFIRMED
+                              <p class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                                Confirmed
                               </p>
                               <div class="divide-y divide-[var(--border-color)]">
                                 @for (reg of confirmedAttendees(); track reg.id) {
@@ -286,8 +286,8 @@ import { Event } from '@shared/types/event.types';
                           <!-- Waitlisted Attendees Section -->
                           @if (waitlistedAttendees().length > 0) {
                             <div class="space-y-2 mt-6">
-                              <p class="text-xs font-bold tracking-wider text-amber-400">
-                                WAITLIST (IN ORDER)
+                              <p class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                                Waitlist
                               </p>
                               <div class="divide-y divide-[var(--border-color)]">
                                 @for (reg of waitlistedAttendees(); track reg.id) {
@@ -305,8 +305,8 @@ import { Event } from '@shared/types/event.types';
                                           <h4 class="text-sm font-semibold text-[var(--text-primary)] truncate">
                                             {{ reg.user.full_name }}
                                           </h4>
-                                          <span class="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
-                                            Pos #{{ reg.waitlist_position }}
+                                          <span class="text-xs text-[var(--text-secondary)] shrink-0 font-medium">
+                                            #{{ reg.waitlist_position }}
                                           </span>
                                         </div>
                                         <p class="text-xs text-[var(--text-secondary)] truncate">
