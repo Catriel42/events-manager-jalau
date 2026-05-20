@@ -14,7 +14,7 @@ import {
 import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { AdminGuard } from './guards/admin.guard';
-import { CalendarService } from './calendar.service';
+import { CalendarService, CalendarSyncResult } from './calendar.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -45,7 +45,9 @@ export class EventsController {
     });
 
     if (!registration) {
-      throw new Error('You must be registered to sync this event to your calendar.');
+      throw new Error(
+        'You must be registered to sync this event to your calendar.',
+      );
     }
 
     // Obtenemos el usuario completo con sus tokens
@@ -53,7 +55,7 @@ export class EventsController {
 
     if (!fullUser) throw new Error('User not found');
 
-    let result;
+    let result: CalendarSyncResult | undefined;
     if (registration.calendar_event_id) {
       // Update existing calendar event to prevent duplicates
       result = await this.calendarService.updateEventInUserCalendar(

@@ -58,7 +58,10 @@ export class RegistrationsService {
           where: { event_id: eventId, status: RegistrationStatus.waitlisted },
           orderBy: { waitlist_position: 'desc' },
         });
-        waitlistPosition = lastWaitlist && lastWaitlist.waitlist_position ? lastWaitlist.waitlist_position + 1 : 1;
+        waitlistPosition =
+          lastWaitlist && lastWaitlist.waitlist_position
+            ? lastWaitlist.waitlist_position + 1
+            : 1;
       }
     }
 
@@ -141,7 +144,10 @@ export class RegistrationsService {
           },
         });
       }
-    } else if (registration.status === RegistrationStatus.waitlisted && registration.waitlist_position !== null) {
+    } else if (
+      registration.status === RegistrationStatus.waitlisted &&
+      registration.waitlist_position !== null
+    ) {
       // If we cancelled a waitlisted registration, we shift positions of everyone after them
       await this.prisma.registration.updateMany({
         where: {

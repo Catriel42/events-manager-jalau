@@ -6,13 +6,21 @@ import { UserEntity } from '@users/dto/user.interface';
 import { Event } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 
+export interface CalendarSyncResult {
+  url: string;
+  eventId: string;
+}
+
 @Injectable()
 export class CalendarService {
   private readonly logger = new Logger(CalendarService.name);
 
   constructor(private configService: ConfigService) {}
 
-  async addEventToUserCalendar(user: UserEntity, event: Event) {
+  async addEventToUserCalendar(
+    user: UserEntity,
+    event: Event,
+  ): Promise<CalendarSyncResult | undefined> {
     if (!user.refresh_token) {
       this.logger.warn(
         `User ${user.email} has no refresh token. Skipping calendar sync.`,
@@ -117,7 +125,11 @@ export class CalendarService {
     };
   }
 
-  async updateEventInUserCalendar(user: UserEntity, event: Event, calendarEventId: string) {
+  async updateEventInUserCalendar(
+    user: UserEntity,
+    event: Event,
+    calendarEventId: string,
+  ): Promise<CalendarSyncResult | undefined> {
     if (!user.refresh_token) {
       this.logger.warn(
         `User ${user.email} has no refresh token. Skipping calendar update.`,
@@ -137,7 +149,7 @@ export class CalendarService {
           refresh_token: user.refresh_token,
         });
         const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
-        
+
         const googleEvent = {
           summary: event.title,
           description: event.description,
@@ -158,8 +170,10 @@ export class CalendarService {
           eventId: calendarEventId,
           requestBody: googleEvent,
         });
-        
-        this.logger.log(`Event ${calendarEventId} updated in Google Calendar for ${user.email}`);
+
+        this.logger.log(
+          `Event ${calendarEventId} updated in Google Calendar for ${user.email}`,
+        );
         return {
           url: response.data.htmlLink!,
           eventId: response.data.id!,
@@ -187,12 +201,16 @@ export class CalendarService {
           },
           location: {
             displayName:
-              event.event_type === 'virtual' ? event.meeting_url : event.location,
+              event.event_type === 'virtual'
+                ? event.meeting_url
+                : event.location,
           },
         };
 
         await client.api(`/me/events/${calendarEventId}`).patch(microsoftEvent);
-        this.logger.log(`Event ${calendarEventId} updated in Microsoft Calendar for ${user.email}`);
+        this.logger.log(
+          `Event ${calendarEventId} updated in Microsoft Calendar for ${user.email}`,
+        );
         return {
           url: 'https://outlook.live.com/calendar/0/view/month',
           eventId: calendarEventId,
@@ -230,7 +248,9 @@ export class CalendarService {
           calendarId: 'primary',
           eventId: calendarEventId,
         });
-        this.logger.log(`Event ${calendarEventId} deleted from Google Calendar for ${user.email}`);
+        this.logger.log(
+          `Event ${calendarEventId} deleted from Google Calendar for ${user.email}`,
+        );
       } else if (user.provider === 'microsoft') {
         const client = Client.init({
           authProvider: (done) => {
@@ -238,7 +258,9 @@ export class CalendarService {
           },
         });
         await client.api(`/me/events/${calendarEventId}`).delete();
-        this.logger.log(`Event ${calendarEventId} deleted from Microsoft Calendar for ${user.email}`);
+        this.logger.log(
+          `Event ${calendarEventId} deleted from Microsoft Calendar for ${user.email}`,
+        );
       }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
