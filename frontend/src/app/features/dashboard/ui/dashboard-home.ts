@@ -1,5 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { EventsApi } from '@core/services/events-api';
 import { Event } from '@shared/types/event.types';
 import { EventFormModal } from './event-form-modal';
@@ -7,7 +8,7 @@ import { EventFormModal } from './event-form-modal';
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [CommonModule, EventFormModal],
+  imports: [CommonModule, RouterModule, EventFormModal],
   template: `
     <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700 my-8 md:my-12">
       <!-- Header Section -->
@@ -26,6 +27,16 @@ import { EventFormModal } from './event-form-modal';
           </svg>
           New Event
         </button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="flex border-b border-[var(--border-color)]">
+        <a routerLink="/dashboard" class="px-6 py-3 border-b-2 border-blue-500 text-blue-400 font-semibold text-sm transition-all duration-200">
+          Events
+        </a>
+        <a routerLink="/dashboard/registrations" class="px-6 py-3 border-b-2 border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium text-sm transition-all duration-200">
+          Registrations
+        </a>
       </div>
 
       <!-- Stats Overview - Desktop -->
