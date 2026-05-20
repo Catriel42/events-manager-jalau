@@ -94,9 +94,22 @@ export class RegistrationsService {
     });
   }
 
-  async getEventRegistration(eventId: string): Promise<Registration[]> {
+  async getEventRegistrations(eventId: string) {
     return this.prisma.registration.findMany({
       where: { event_id: eventId, status: RegistrationStatus.confirmed },
+      include: {
+        user: {
+          select: {
+            id: true,
+            full_name: true,
+            email: true,
+            avatar_url: true,
+          },
+        },
+      },
+      orderBy: {
+        registered_at: 'desc',
+      },
     });
   }
 }

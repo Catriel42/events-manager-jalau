@@ -10,6 +10,7 @@ import {
 import type { Request } from 'express';
 import { RegistrationsService } from './registrations.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../events/guards/admin.guard';
 
 @Controller('events/:eventId/registrations')
 export class RegistrationsController {
@@ -20,6 +21,12 @@ export class RegistrationsController {
   async register(@Param('eventId') eventId: string, @Req() req: Request) {
     const user = req.user as { id: string };
     return this.registrationsService.register(eventId, user.id);
+  }
+
+  @Get('all')
+  @UseGuards(AdminGuard)
+  async getEventRegistrations(@Param('eventId') eventId: string) {
+    return this.registrationsService.getEventRegistrations(eventId);
   }
 
   @Get()
