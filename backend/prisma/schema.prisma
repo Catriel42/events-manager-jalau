@@ -100,6 +100,7 @@ model Registration {
   status            RegistrationStatus
   waitlist_position Int?
   token             String             @unique @default(uuid()) @db.Uuid
+  calendar_event_id String?            @db.Text
   registered_at     DateTime           @default(now())
   cancelled_at      DateTime?
 
