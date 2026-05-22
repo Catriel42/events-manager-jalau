@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { Module } from '@nestjs/common';
 import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
 
-/* eslint-disable @typescript-eslint/no-require-imports */
 const { HandlebarsAdapter } =
   require('@nestjs-modules/mailer/adapters/handlebars.adapter') as {
     HandlebarsAdapter: new () => MailerOptions['template'] extends {
@@ -10,7 +10,6 @@ const { HandlebarsAdapter } =
       ? NonNullable<A>
       : never;
   };
-/* eslint-enable @typescript-eslint/no-require-imports */
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { NotificationsService } from './notifications.service';
@@ -36,7 +35,12 @@ import { PrismaModule } from '../prisma/prisma.module';
           from: config.get<string>('MAIL_FROM'),
         },
         template: {
-          dir: join(__dirname, 'templates'),
+          dir: join(
+            __dirname,
+            __dirname.endsWith('notifications')
+              ? 'templates'
+              : 'notifications/templates',
+          ),
           adapter: new HandlebarsAdapter(),
           options: { strict: true },
         },
