@@ -19,8 +19,12 @@ async function bootstrap() {
   );
 
   const frontendUrl = configService.get<string>('FRONTEND_URL');
+  const origins = frontendUrl
+    ? frontendUrl.split(',').map((url) => url.trim().replace(/\/$/, ''))
+    : [];
+
   app.enableCors({
-    origin: frontendUrl?.replace(/\/$/, ''),
+    origin: origins.length === 1 ? origins[0] : origins,
     credentials: true,
   });
 
