@@ -183,11 +183,21 @@ export class EventFormModal implements OnInit {
     });
   }
 
+  private toLocalDatetimeLocal(dateString: string | Date): string {
+    const d = new Date(dateString);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
   private patchForm() {
     this.form.patchValue({
       ...this.event,
-      starts_at: this.event?.starts_at ? new Date(this.event.starts_at).toISOString().slice(0, 16) : '',
-      ends_at: this.event?.ends_at ? new Date(this.event.ends_at).toISOString().slice(0, 16) : '',
+      starts_at: this.event?.starts_at ? this.toLocalDatetimeLocal(this.event.starts_at) : '',
+      ends_at: this.event?.ends_at ? this.toLocalDatetimeLocal(this.event.ends_at) : '',
     });
   }
 
@@ -209,7 +219,12 @@ export class EventFormModal implements OnInit {
     if (this.form.invalid) return;
 
     this.isSaving.set(true);
-    const data = this.form.value;
+    const formValue = this.form.value;
+    const data = {
+      ...formValue,
+      starts_at: formValue.starts_at ? new Date(formValue.starts_at).toISOString() : '',
+      ends_at: formValue.ends_at ? new Date(formValue.ends_at).toISOString() : '',
+    };
 
     const request = this.event 
       ? this.eventsApi.updateEvent(this.event.id, data)
