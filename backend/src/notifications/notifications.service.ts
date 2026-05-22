@@ -1,6 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { Resend } from 'resend';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as handlebars from 'handlebars';
 import {
   Event,
   NotificationStatus,
@@ -9,13 +13,53 @@ import {
 } from '@prisma/client';
 
 @Injectable()
-export class NotificationsService {
+export class NotificationsService implements OnModuleInit {
   private readonly logger = new Logger(NotificationsService.name);
+  private resend: Resend;
+  private templateDir: string;
+  private compiledTemplates: Map<string, handlebars.TemplateDelegate> =
+    new Map();
 
   constructor(
-    private mailer: MailerService,
     private prisma: PrismaService,
-  ) {}
+    private config: ConfigService,
+  ) {
+    const apiKey = this.config.get<string>('MAIL_PASS');
+    if (!apiKey) {
+      this.logger.warn('MAIL_PASS is not set. Resend email sending will fail.');
+    }
+    // We use MAIL_PASS since that was originally used for SMTP auth.
+    this.resend = new Resend(apiKey);
+  }
+
+  onModuleInit() {
+    this.templateDir = path.join(
+      __dirname,
+      __dirname.endsWith('notifications')
+        ? 'templates'
+        : 'notifications/templates',
+    );
+    this.logger.log(`Resolved template directory: ${this.templateDir}`);
+  }
+
+  private getCompiledTemplate(
+    templateName: string,
+  ): handlebars.TemplateDelegate {
+    if (this.compiledTemplates.has(templateName)) {
+      return this.compiledTemplates.get(templateName)!;
+    }
+
+    try {
+      const templatePath = path.join(this.templateDir, `${templateName}.hbs`);
+      const templateSource = fs.readFileSync(templatePath, 'utf8');
+      const compiled = handlebars.compile(templateSource, { strict: true });
+      this.compiledTemplates.set(templateName, compiled);
+      return compiled;
+    } catch (error) {
+      this.logger.error(`Failed to compile template ${templateName}:`, error);
+      throw error;
+    }
+  }
 
   /**
    * Sends a registration confirmation email and logs it to NotificationLog.
@@ -36,24 +80,34 @@ export class NotificationsService {
     let errorMessage: string | undefined;
 
     try {
-      await this.mailer.sendMail({
+      const template = this.getCompiledTemplate('registration-confirmation');
+      const html = template({
+        name: user.full_name,
+        eventTitle: event.title,
+        eventDate: this.formatDate(event.starts_at),
+        eventTime: this.formatTime(event.starts_at),
+        location:
+          event.event_type === 'virtual' ? event.meeting_url : event.location,
+        isVirtual: event.event_type === 'virtual',
+        isWaitlisted,
+        waitlistPosition,
+      });
+
+      const fromEmail =
+        this.config.get<string>('MAIL_FROM') || 'Acme <onboarding@resend.dev>';
+
+      const { error } = await this.resend.emails.send({
+        from: fromEmail,
         to: user.email,
         subject: isWaitlisted
           ? `You're on the waitlist for "${event.title}"`
           : `You're registered for "${event.title}"! 🎉`,
-        template: 'registration-confirmation',
-        context: {
-          name: user.full_name,
-          eventTitle: event.title,
-          eventDate: this.formatDate(event.starts_at),
-          eventTime: this.formatTime(event.starts_at),
-          location:
-            event.event_type === 'virtual' ? event.meeting_url : event.location,
-          isVirtual: event.event_type === 'virtual',
-          isWaitlisted,
-          waitlistPosition,
-        },
+        html,
       });
+
+      if (error) {
+        throw new Error(error.message);
+      }
 
       this.logger.log(
         `Sent ${type} email to ${user.email} for event "${event.title}"`,
@@ -66,15 +120,23 @@ export class NotificationsService {
       );
     }
 
-    await this.prisma.notificationLog.create({
-      data: {
-        registration_id: registrationId,
-        type,
-        status,
-        sent_at: status === NotificationStatus.sent ? new Date() : null,
-        error_message: errorMessage ?? null,
-      },
-    });
+    try {
+      await this.prisma.notificationLog.create({
+        data: {
+          registration_id: registrationId,
+          type,
+          status,
+          sent_at: status === NotificationStatus.sent ? new Date() : null,
+          error_message: errorMessage ?? null,
+        },
+      });
+    } catch (_dbError) {
+      // If the registration was deleted (e.g. user unregistered quickly) while the email
+      // was sending, a foreign key violation (P2003) will occur. We can safely ignore this.
+      this.logger.warn(
+        `Could not save notification log for registration ${registrationId} (it may have been deleted).`,
+      );
+    }
   }
 
   /**
@@ -93,23 +155,33 @@ export class NotificationsService {
     let errorMessage: string | undefined;
 
     try {
-      await this.mailer.sendMail({
+      const template = this.getCompiledTemplate('event-reminder');
+      const html = template({
+        name: user.full_name,
+        eventTitle: event.title,
+        eventDate: this.formatDate(event.starts_at),
+        eventTime: this.formatTime(event.starts_at),
+        location:
+          event.event_type === 'virtual' ? event.meeting_url : event.location,
+        isVirtual: event.event_type === 'virtual',
+        isOneHour,
+      });
+
+      const fromEmail =
+        this.config.get<string>('MAIL_FROM') || 'Acme <onboarding@resend.dev>';
+
+      const { error } = await this.resend.emails.send({
+        from: fromEmail,
         to: user.email,
         subject: isOneHour
           ? `⏰ "${event.title}" starts in 1 hour!`
           : `📅 Reminder: "${event.title}" is tomorrow!`,
-        template: 'event-reminder',
-        context: {
-          name: user.full_name,
-          eventTitle: event.title,
-          eventDate: this.formatDate(event.starts_at),
-          eventTime: this.formatTime(event.starts_at),
-          location:
-            event.event_type === 'virtual' ? event.meeting_url : event.location,
-          isVirtual: event.event_type === 'virtual',
-          isOneHour,
-        },
+        html,
       });
+
+      if (error) {
+        throw new Error(error.message);
+      }
 
       this.logger.log(
         `Sent ${type} reminder to ${user.email} for event "${event.title}"`,
