@@ -136,6 +136,7 @@ export class NotificationsService implements OnModuleInit {
       this.logger.warn(
         `Could not save notification log for registration ${registrationId} (it may have been deleted).`,
       );
+      console.log(_dbError);
     }
   }
 
