@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from './notifications.service';
-import { NotificationType, RegistrationStatus } from '@prisma/client';
+import { RegistrationStatus } from '@prisma/client';
 
 @Injectable()
 export class EventReminderTask {
@@ -34,15 +34,15 @@ export class EventReminderTask {
 
     // --- 24-hour window ---
     const h24From = new Date(now.getTime() + 23 * 60 * 60 * 1000); // now + 23h
-    const h24To   = new Date(now.getTime() + 25 * 60 * 60 * 1000); // now + 25h
+    const h24To = new Date(now.getTime() + 25 * 60 * 60 * 1000); // now + 25h
 
     // --- 1-hour window ---
     const h1From = new Date(now.getTime() + 50 * 60 * 1000); // now + 50min
-    const h1To   = new Date(now.getTime() + 70 * 60 * 1000); // now + 70min
+    const h1To = new Date(now.getTime() + 70 * 60 * 1000); // now + 70min
 
     await Promise.all([
       this.processWindow(h24From, h24To, 'reminder_24h'),
-      this.processWindow(h1From,  h1To,  'reminder_1h'),
+      this.processWindow(h1From, h1To, 'reminder_1h'),
     ]);
   }
 
@@ -80,7 +80,7 @@ export class EventReminderTask {
         // Only include registrations that have NOT been sent this reminder type yet
         notification_logs: {
           none: {
-            type: type as NotificationType,
+            type: type,
             status: 'sent',
           },
         },

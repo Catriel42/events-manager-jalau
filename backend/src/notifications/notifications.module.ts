@@ -1,9 +1,16 @@
 import { Module } from '@nestjs/common';
 import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { HandlebarsAdapter } = require('@nestjs-modules/mailer/adapters/handlebars.adapter') as {
-  HandlebarsAdapter: new () => MailerOptions['template'] extends { adapter?: infer A } ? NonNullable<A> : never;
-};
+
+/* eslint-disable @typescript-eslint/no-require-imports */
+const { HandlebarsAdapter } =
+  require('@nestjs-modules/mailer/adapters/handlebars.adapter') as {
+    HandlebarsAdapter: new () => MailerOptions['template'] extends {
+      adapter?: infer A;
+    }
+      ? NonNullable<A>
+      : never;
+  };
+/* eslint-enable @typescript-eslint/no-require-imports */
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { NotificationsService } from './notifications.service';

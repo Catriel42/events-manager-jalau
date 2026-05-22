@@ -1,7 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { PrismaService } from '../prisma/prisma.service';
-import { Event, NotificationStatus, NotificationType, User } from '@prisma/client';
+import {
+  Event,
+  NotificationStatus,
+  NotificationType,
+  User,
+} from '@prisma/client';
 
 @Injectable()
 export class NotificationsService {
@@ -121,7 +126,7 @@ export class NotificationsService {
     await this.prisma.notificationLog.create({
       data: {
         registration_id: registrationId,
-        type: type as NotificationType,
+        type: type,
         status,
         sent_at: status === NotificationStatus.sent ? new Date() : null,
         error_message: errorMessage ?? null,
