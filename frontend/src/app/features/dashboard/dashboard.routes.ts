@@ -18,6 +18,16 @@ export const dashboardRoutes: Routes = [
         loadComponent: () =>
           import('./ui/registrations-view').then((m) => m.RegistrationsView),
       },
+      {
+        path: 'tags',
+        loadComponent: () =>
+          import('./ui/tags-view').then((m) => m.TagsView),
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./ui/users-view').then((m) => m.UsersView),
+      },
     ],
   },
 ];
