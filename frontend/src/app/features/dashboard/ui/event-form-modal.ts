@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Event } from '@shared/types/event.types';
 import { EventsApi } from '@core/services/events-api';
+import { TagsApi, Tag } from '@core/services/tags-api';
 import { UploadService } from '@core/services/upload.service';
 import { finalize } from 'rxjs';
 
@@ -123,6 +124,28 @@ import { finalize } from 'rxjs';
               </select>
             </div>
           </div>
+
+          <!-- Tags -->
+          <div class="space-y-2">
+            <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Tags</label>
+            <div class="flex flex-wrap gap-2 p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl">
+              @if (availableTags().length === 0) {
+                <span class="text-sm text-[var(--text-muted)]">No tags available.</span>
+              } @else {
+                @for (tag of availableTags(); track tag.id) {
+                  <label class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg cursor-pointer hover:bg-white/10 transition-colors">
+                    <input 
+                      type="checkbox" 
+                      [checked]="hasTag(tag.id)" 
+                      (change)="toggleTag(tag.id)"
+                      class="rounded bg-black/20 border-white/20 text-blue-500 focus:ring-blue-500/50"
+                    >
+                    <span class="text-sm text-white font-medium">{{ tag.name }}</span>
+                  </label>
+                }
+              }
+            </div>
+          </div>
         </form>
 
         <!-- Footer -->
@@ -155,17 +178,27 @@ export class EventFormModal implements OnInit {
 
   private fb = inject(FormBuilder);
   private eventsApi = inject(EventsApi);
+  private tagsApi = inject(TagsApi);
   private uploadService = inject(UploadService);
 
   form!: FormGroup;
   isSaving = signal(false);
   isUploading = signal(false);
+  availableTags = signal<Tag[]>([]);
 
   ngOnInit() {
     this.initForm();
+    this.loadTags();
     if (this.event) {
       this.patchForm();
     }
+  }
+
+  private loadTags() {
+    this.tagsApi.getAllTags().subscribe({
+      next: (tags) => this.availableTags.set(tags),
+      error: (err) => console.error('Failed to load tags', err)
+    });
   }
 
   private initForm() {
@@ -180,6 +213,7 @@ export class EventFormModal implements OnInit {
       meeting_url: [''],
       capacity: [null, [Validators.min(1)]],
       banner_url: [''],
+      tag_ids: [[]],
     });
   }
 
@@ -198,7 +232,23 @@ export class EventFormModal implements OnInit {
       ...this.event,
       starts_at: this.event?.starts_at ? this.toLocalDatetimeLocal(this.event.starts_at) : '',
       ends_at: this.event?.ends_at ? this.toLocalDatetimeLocal(this.event.ends_at) : '',
+      tag_ids: this.event?.tags?.map(t => t.id) || [],
     });
+  }
+
+  hasTag(tagId: string): boolean {
+    const ids: string[] = this.form.get('tag_ids')?.value || [];
+    return ids.includes(tagId);
+  }
+
+  toggleTag(tagId: string) {
+    const ids: string[] = this.form.get('tag_ids')?.value || [];
+    if (ids.includes(tagId)) {
+      this.form.patchValue({ tag_ids: ids.filter(id => id !== tagId) });
+    } else {
+      this.form.patchValue({ tag_ids: [...ids, tagId] });
+    }
+    this.form.get('tag_ids')?.markAsDirty();
   }
 
   onFileSelected(event: any) {
