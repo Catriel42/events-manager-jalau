@@ -33,9 +33,9 @@ export class EventCard {
   getEventStatusLabel(status: EventStatus): string {
     const labels: Record<EventStatus, string> = {
       draft: 'Draft',
-      published: 'New',
+      published: 'Available',
       cancelled: 'Cancelled',
-      completed: 'Completed'
+      completed: 'Finished'
     };
     return labels[status];
   }
