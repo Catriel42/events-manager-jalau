@@ -18,6 +18,7 @@ import { CalendarService, CalendarSyncResult } from './calendar.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { EventStatus } from '@prisma/client';
 
 @Controller('events')
 export class EventsController {
@@ -80,6 +81,22 @@ export class EventsController {
     }
 
     return { url: result?.url };
+  }
+
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  findMyEvents(
+    @Req() req: { user: { id: string } },
+    @Query('status') status?: EventStatus,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.eventsService.findMyEvents(
+      req.user.id,
+      status,
+      page ? Number(page) : 1,
+      limit ? Number(limit) : 10,
+    );
   }
 
   @Get()

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, EventStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { CalendarService } from './calendar.service';
@@ -43,7 +43,57 @@ export class EventsService {
         total,
         page,
         limit,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    };
+  }
+
+  async findMyEvents(
+    userId: string,
+    status?: EventStatus,
+    page = 1,
+    limit = 10,
+  ) {
+    const skip = (page - 1) * limit;
+    const where: Prisma.EventWhereInput = {
+      registrations: {
+        some: { user_id: userId },
+      },
+    };
+
+    if (status) {
+      where.status = status;
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.event.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { starts_at: 'desc' },
+        include: {
+          tags: {
+            include: {
+              tag: true,
+            },
+          },
+        },
+      }),
+      this.prisma.event.count({ where }),
+    ]);
+
+    const events = data.map((event) => ({
+      ...event,
+      tags: event.tags.map((et) => et.tag),
+    }));
+
+    return {
+      data: events,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit) || 1,
       },
     };
   }
