@@ -24,7 +24,7 @@ export class EventList implements OnInit {
   groupedEvents = computed(() => {
     const list = this.events();
     const groups: { label: string; events: Event[] }[] = [];
-    
+
     for (const event of list) {
       const label = this.getGroupLabel(event);
       let group = groups.find(g => g.label === label);
@@ -71,14 +71,14 @@ export class EventList implements OnInit {
   getGroupLabel(event: Event): string {
     const startsAt = new Date(event.starts_at);
     const now = new Date();
-    
+
     // Reset hours to compare dates only
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const eventDay = new Date(startsAt.getFullYear(), startsAt.getMonth(), startsAt.getDate());
-    
+
     const diffTime = eventDay.getTime() - today.getTime();
     const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) {
       return 'Today';
     } else if (diffDays === 1) {
@@ -113,6 +113,10 @@ export class EventList implements OnInit {
   }
 
   getGridClass(count: number): string {
+    if (this.filterMyEvents()) {
+      return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+    }
+
     if (count === 1) {
       return 'grid-cols-1 w-full';
     } else {
