@@ -11,8 +11,9 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('Starting seeding...');
+  console.log('Starting custom seeding for date grouping verification...');
 
+  // Clean database
   await prisma.notificationLog.deleteMany();
   await prisma.registration.deleteMany();
   await prisma.event_tags.deleteMany();
@@ -22,7 +23,8 @@ async function main() {
 
   console.log('Database cleaned.');
 
-  await prisma.user.create({
+  // Create test user Catriel Dev
+  const user = await prisma.user.create({
     data: {
       full_name: 'Catriel Dev',
       email: 'catriel@jala.university',
@@ -31,99 +33,61 @@ async function main() {
     },
   });
 
-  console.log('Users created.');
+  console.log('Test user created.');
 
-  const tagTech = await prisma.tag.create({
-    data: { name: 'Technology', slug: 'tech' },
-  });
-  const tagJala = await prisma.tag.create({
-    data: { name: 'Jala University', slug: 'jala-u' },
-  });
-
-  const tagDesign = await prisma.tag.create({
-    data: { name: 'Design', slug: 'design' },
-  });
+  // Create Tags
+  const tagTech = await prisma.tag.create({ data: { name: 'Technology', slug: 'tech' } });
+  const tagDesign = await prisma.tag.create({ data: { name: 'Design', slug: 'design' } });
+  const tagSoftSkills = await prisma.tag.create({ data: { name: 'Soft Skills', slug: 'soft-skills' } });
 
   console.log('Tags created.');
 
-  const eventsData = [
-    {
-      title: 'Angular v21 Deep Dive',
-      desc: 'A comprehensive workshop about the latest Angular features.',
-      tag: tagTech.id,
-    },
-    {
-      title: 'React Performance Tuning',
-      desc: 'Learn how to optimize your React applications for speed.',
-      tag: tagTech.id,
-    },
-    {
-      title: 'NestJS Microservices Masterclass',
-      desc: 'Build scalable microservices using NestJS and RabbitMQ.',
-      tag: tagTech.id,
-    },
-    {
-      title: 'Jala University Orientation',
-      desc: 'Welcome session for all new Jala University students.',
-      tag: tagJala.id,
-    },
-    {
-      title: 'Python Data Structures',
-      desc: 'Master lists, dictionaries, sets, and tuples in Python.',
-      tag: tagTech.id,
-    },
-    {
-      title: 'System Design Interview Prep',
-      desc: 'Ace your next big tech company interview with these patterns.',
-      tag: tagTech.id,
-    },
-    {
-      title: 'Figma for Developers',
-      desc: 'Learn how to extract assets and understand design systems.',
-      tag: tagDesign.id,
-    },
-    {
-      title: 'Cyber Security Basics',
-      desc: 'Protect your web applications from common vulnerabilities.',
-      tag: tagTech.id,
-    },
-    {
-      title: 'AWS Cloud Fundamentals',
-      desc: 'Get started with EC2, S3, and Lambda functions.',
-      tag: tagTech.id,
-    },
-    {
-      title: 'Advanced Git Workflow',
-      desc: 'Rebasing, cherry-picking, and resolving merge conflicts.',
-      tag: tagTech.id,
-    },
+  const baseDate = new Date(); // Use current system date to ensure it is always "Today"
+
+  // Only one event for today
+  const topics = [
+    { title: "Angular 18 Reactive Form Patterns", desc: "A workshop on form building.", offsetHours: 0, status: "published", tag: tagTech.id }
   ];
 
-  console.log('Creating virtual events...');
+  console.log(`Generating ${topics.length} events...`);
 
-  for (let i = 0; i < eventsData.length; i++) {
-    const event = eventsData[i];
-    await prisma.event.create({
+  for (let idx = 0; idx < topics.length; idx++) {
+    const topic = topics[idx];
+    const startsAt = new Date(baseDate.getTime() + topic.offsetHours * 60 * 60 * 1000);
+    const endsAt = new Date(startsAt.getTime() + 2 * 60 * 60 * 1000); // 2 hours duration
+
+    const eventType = 'virtual';
+    const location = null;
+    const meetingUrl = 'https://meet.google.com/meet-link-0';
+
+    const event = await prisma.event.create({
       data: {
-        title: event.title,
-        description: event.desc,
-        event_type: 'virtual',
-        status: 'published',
-        meeting_url: `https://meet.google.com/xyz-abc-00${i}`,
-        starts_at: new Date(Date.now() + (i + 1) * 24 * 60 * 60 * 1000), // Empiezan en días consecutivos
-        ends_at: new Date(
-          Date.now() + (i + 1) * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000,
-        ),
-        capacity: 100 + i * 10,
-        calendar_uid: `virtual-event-${i}@jala.u`,
+        title: topic.title,
+        description: topic.desc,
+        event_type: eventType,
+        status: topic.status as any,
+        location,
+        meeting_url: meetingUrl,
+        starts_at: startsAt,
+        ends_at: endsAt,
+        capacity: 100,
+        calendar_uid: `grouping-seed-${idx}@jala.u`,
         tags: {
-          create: [{ tag_id: event.tag }],
+          create: [{ tag_id: topic.tag }],
         },
+      },
+    });
+
+    // Register user to this event
+    await prisma.registration.create({
+      data: {
+        event_id: event.id,
+        user_id: user.id,
+        status: 'confirmed',
       },
     });
   }
 
-  console.log('10 Virtual events created.');
   console.log('Seeding finished successfully.');
 }
 
