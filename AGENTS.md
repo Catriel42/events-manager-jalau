@@ -8,29 +8,42 @@ Monorepo with `backend/` (NestJS 11) and `frontend/` (Angular v21.2). Shared typ
 
 ## Angular v21 Conventions (Frontend)
 
-### File Naming
-- **NO type suffixes in filenames.** Use `login-page.ts`, NOT `login-page.component.ts`.
-- Services: `auth.ts`, NOT `auth.service.ts`.
-- Guards: `auth-guard.ts`, NOT `auth.guard.ts`.
-- Pipes: `date-format.ts`, NOT `date-format.pipe.ts`.
+### Clean Naming (No Suffixes)
+In modern Angular (v21+), suffixes like `Component`, `Service`, `Pipe`, `Guard` are completely omitted in class names, file names, and directories to reduce verbosity and avoid redundancy.
+- **Why?**
+  - **Context-driven:** The directory path (e.g., `features/events/event-list/`), the file extension (`.ts`, `.html`), and the decorator (`@Component`, `@Injectable`) already make the type of file clear.
+  - **Readability:** Imports and references are shorter and cleaner (e.g., `import { EventList } from './event-list'` instead of `import { EventListComponent } from './event-list.component'`).
+  - **Modern alignment:** It aligns with other modern web frameworks (React, Vue, Svelte) which define components simply as their logical name.
+- **File Naming Examples:**
+  - Components: `event-list.ts`, NOT `event-list.component.ts`.
+  - Services: `auth.ts`, NOT `auth.service.ts`.
+  - Guards: `auth-guard.ts`, NOT `auth.guard.ts`.
+  - Pipes: `date-format.ts`, NOT `date-format.pipe.ts`.
+- **Class Naming Examples:**
+  - Components: `export class EventList`, NOT `export class EventListComponent`.
+  - Services: `export class Auth`, NOT `export class AuthService`.
 
-### Class Naming
-- **NO suffix in class names.** Use `export class LoginPage`, NOT `export class LoginPageComponent`.
-- Services: `export class Auth`, or descriptive names like `export class AuthService` only if needed for clarity.
+### File Separation (HTML and TS)
+- **Separate Template Files:** Every component must separate its presentation layer (HTML) and its logic (TypeScript) into individual files (e.g., `event-list.html` and `event-list.ts`).
+- **No Inline Templates:** Using the inline `template: ...` property inside the `@Component` decorator is prohibited to ensure clean codebase organization and separation of concerns.
 
-### Component Patterns
-- **standalone is the default.** Do NOT write `standalone: true` in decorators.
-- **Zoneless is the default in v21.** Do NOT use `ChangeDetectionStrategy.OnPush`. Signals notify Angular automatically.
-- **No lifecycle hooks.** Do NOT use `ngOnInit`, `ngOnChanges`, `ngOnDestroy`. Use:
-  - `inject()` for dependency injection (not constructor injection)
-  - `signal()`, `computed()` for state
-  - `input()`, `output()` for component I/O
-  - `effect()` for side effects
-  - `DestroyRef` for cleanup
-  - `afterNextRender()` for DOM access
-- **Native control flow.** Use `@if`, `@for`, `@switch`. NOT `*ngIf`, `*ngFor`, `*ngSwitch`.
-- **Reactive Forms** over Template-driven forms.
-- Use `class` bindings, NOT `ngClass`. Use `style` bindings, NOT `ngStyle`.
+### Reactivity with Signals
+- **Mandatory Signals:** All state, inputs, and outputs must be implemented using Angular Signals.
+- **State Management:** Use `signal()` and `computed()` for reactive state. Do not use standard mutable class properties or RxJS subjects for internal component state unless integrating with external asynchronous streams.
+- **Component I/O:** Use modern signal inputs and outputs:
+  - Inputs: `input()` or `input.required()`.
+  - Outputs: `output()`.
+
+### Functional Dependency Injection
+- **Mandatory inject():** Use the functional `inject()` function at the class level for dependency injection.
+- **No Constructor Injection:** Constructor-based injection (`constructor(private auth: Auth)`) is strictly prohibited. Constructors should only be used for initialization if required, though lifecycle management is preferred via `effect()` or standard reactivity.
+
+### Decorators and Control Flow
+- **standalone is the default:** Do NOT write `standalone: true` in component decorators.
+- **Zoneless is the default:** Do NOT use `ChangeDetectionStrategy.OnPush`. Signals notify Angular automatically.
+- **No legacy lifecycle hooks:** Do NOT use `ngOnInit`, `ngOnChanges`, or `ngOnDestroy`. Use `inject(DestroyRef)` for cleanup and `effect()` for side effects.
+- **Native control flow:** Use `@if`, `@for`, and `@switch`. Do not use `*ngIf`, `*ngFor`, or `*ngSwitch`.
+- **Styling bindings:** Use class bindings (`[class.some-class]="condition"`) and style bindings (`[style.color]="someColor"`) instead of `ngClass` and `ngStyle`.
 
 ### Architecture
 ```
