@@ -162,10 +162,7 @@ export class EventsService {
   async update(id: string, data: UpdateEventDto) {
     await this.findById(id);
 
-    const eventData = data;
-    const startAt = data.starts_at;
-    const endAt = data.ends_at;
-    const tagIds = data.tag_ids;
+    const { tag_ids: tagIds, starts_at: startAt, ends_at: endAt, ...eventData } = data;
 
     const updateData: Prisma.EventUpdateInput = {
       ...eventData,
