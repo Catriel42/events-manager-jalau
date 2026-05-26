@@ -110,7 +110,7 @@ import { DashboardNav } from './dashboard-nav';
                           'bg-blue-500/10 text-blue-400 border border-blue-500/20': event.status === 'completed'
                         }"
                       >
-                        {{ event.status }}
+                        {{ getStatusLabel(event.status) }}
                       </span>
                     </td>
                     <td class="px-6 py-4 text-right">
@@ -173,7 +173,7 @@ import { DashboardNav } from './dashboard-nav';
                       'bg-blue-500/10 text-blue-400 border border-blue-500/20': event.status === 'completed'
                     }"
                   >
-                    {{ event.status }}
+                    {{ getStatusLabel(event.status) }}
                   </span>
                 </div>
                 <div class="flex flex-col gap-2 shrink-0">
@@ -242,6 +242,16 @@ import { DashboardNav } from './dashboard-nav';
 })
 export class DashboardHome implements OnInit {
   private eventsApi = inject(EventsApi);
+
+  getStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      draft: 'Draft',
+      published: 'Published',
+      cancelled: 'Cancelled',
+      completed: 'Finished'
+    };
+    return labels[status] || status;
+  }
 
   events = signal<Event[]>([]);
   isLoading = signal(true);

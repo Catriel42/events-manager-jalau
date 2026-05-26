@@ -120,7 +120,7 @@ import { finalize } from 'rxjs';
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
                 <option value="cancelled">Cancelled</option>
-                <option value="completed">Completed</option>
+                <option value="completed">Finished</option>
               </select>
             </div>
           </div>
