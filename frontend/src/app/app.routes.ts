@@ -27,6 +27,24 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'my-events',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./shared/layouts/event-layout/event-layout').then(
+        (m) => m.EventLayout,
+      ),
+    children: [
+      {
+        path: '',
+        data: { filterMyEvents: true },
+        loadComponent: () =>
+          import('./features/events/event-list/event-list').then(
+            (m) => m.EventList,
+          ),
+      },
+    ],
+  },
+  {
     path: 'cancel/:token',
     loadComponent: () =>
       import('./features/cancel/ui/cancel-page').then((m) => m.CancelPage),

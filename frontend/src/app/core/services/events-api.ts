@@ -43,6 +43,14 @@ export class EventsApi {
     return this.getEvents(page, limit, true);
   }
 
+  getMyEvents(page = 1, limit = 10, status?: string): Observable<PaginatedResponse<Event>> {
+    const params: any = { page, limit };
+    if (status) {
+      params.status = status;
+    }
+    return this.http.get<PaginatedResponse<Event>>(`${this.baseUrl}/my`, { params });
+  }
+
   getEvent(id: string): Observable<Event> {
     return this.http.get<Event>(`${this.baseUrl}/${id}`);
   }
