@@ -199,4 +199,58 @@ export class RegistrationsService {
       },
     });
   }
+
+  async getAllRegistrationsGlobally() {
+    return this.prisma.registration.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            full_name: true,
+            email: true,
+            avatar_url: true,
+          },
+        },
+        event: {
+          select: {
+            id: true,
+            title: true,
+            starts_at: true,
+            event_type: true,
+          },
+        },
+      },
+      orderBy: {
+        registered_at: 'desc',
+      },
+    });
+  }
+
+  async updateRegistrationStatus(id: string, status: RegistrationStatus) {
+    const registration = await this.prisma.registration.findUnique({
+      where: { id },
+    });
+
+    if (!registration) {
+      throw new NotFoundException('Registration not found');
+    }
+
+    return this.prisma.registration.update({
+      where: { id },
+      data: { status },
+    });
+  }
+
+  async deleteRegistrationGlobally(id: string) {
+    const registration = await this.prisma.registration.findUnique({
+      where: { id },
+    });
+
+    if (!registration) {
+      throw new NotFoundException('Registration not found');
+    }
+
+    // Reuse the unregister method to handle side effects (calendar removal, waitlist promotion)
+    return this.unregister(registration.event_id, registration.user_id);
+  }
 }
