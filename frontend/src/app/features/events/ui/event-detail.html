@@ -16,7 +16,7 @@
         </div>
         <p class="text-lg text-[var(--text-primary)] mb-2">{{ error() }}</p>
         <a routerLink="/events" class="text-blue-400 hover:text-blue-300 transition-colors">
-          ← Volver a eventos
+          ← Back to events
         </a>
       </div>
     </div>
@@ -25,7 +25,7 @@
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
       </svg>
-      Volver a eventos
+      Back to events
     </a>
 
     <article class="bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl overflow-hidden">
@@ -57,7 +57,7 @@
           </span>
         </div>
 
-        <!-- Título -->
+        <!-- Title -->
         <h1 class="text-3xl md:text-4xl font-semibold text-[var(--text-primary)] mb-4">
           {{ evt.title }}
         </h1>
@@ -127,7 +127,7 @@
           }
         </div>
 
-        <!-- Descripción -->
+        <!-- Description -->
         @if (evt.description) {
           <div class="border-t border-[var(--border-color)] pt-8">
             <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-4">About this event</h2>
