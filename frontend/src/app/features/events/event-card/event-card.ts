@@ -14,9 +14,9 @@ export class EventCard {
 
   getEventTypeLabel(type: EventType): string {
     const labels: Record<EventType, string> = {
-      in_person: 'Presencial',
+      in_person: 'In Person',
       virtual: 'Virtual',
-      hybrid: 'Híbrido'
+      hybrid: 'Hybrid'
     };
     return labels[type];
   }
@@ -32,10 +32,10 @@ export class EventCard {
 
   getEventStatusLabel(status: EventStatus): string {
     const labels: Record<EventStatus, string> = {
-      draft: 'Borrador',
+      draft: 'Draft',
       published: 'New',
-      cancelled: 'Cancelado',
-      completed: 'Completado'
+      cancelled: 'Cancelled',
+      completed: 'Completed'
     };
     return labels[status];
   }
@@ -52,7 +52,7 @@ export class EventCard {
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('es-ES', {
+    return new Intl.DateTimeFormat('en-US', {
       weekday: 'short',
       day: 'numeric',
       month: 'short',

@@ -1,5 +1,5 @@
-<a [routerLink]="['/events', event().id]" class="block">
-  <article class="bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl overflow-hidden hover:border-blue-500/30 transition-all duration-300 group">
+<a [routerLink]="['/events', event().id]" class="block h-full">
+  <article class="bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl overflow-hidden hover:border-blue-500/30 transition-all duration-300 group h-full flex flex-col">
     <!-- Banner -->
     <div class="h-48 w-full overflow-hidden">
       @if (event().banner_url) {
@@ -13,8 +13,8 @@
       }
     </div>
 
-    <!-- Contenido -->
-    <div class="p-4">
+    <!-- Content -->
+    <div class="p-4 flex-grow flex flex-col">
       <!-- Badges -->
       <div class="flex gap-2 mb-3">
         <span class="px-2 py-1 rounded-full text-xs font-medium" 
@@ -27,20 +27,20 @@
         </span>
       </div>
 
-      <!-- Título -->
+      <!-- Title -->
       <h3 class="text-[var(--text-primary)] font-medium text-lg mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
         {{ event().title }}
       </h3>
 
-      <!-- Fecha -->
-      <div class="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-2">
+      <!-- Date -->
+      <div class="flex items-center gap-2 text-sm text-[var(--text-secondary)] mt-auto mb-2">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
         {{ formatDate(event().starts_at) }}
       </div>
 
-      <!-- Ubicación -->
+      <!-- Location -->
       @if (event().location) {
         <div class="flex items-center gap-2 text-sm text-[var(--text-muted)]">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
