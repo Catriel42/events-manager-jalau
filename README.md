@@ -13,87 +13,87 @@ Monorepo for the Jala University Events Management Platform. Built with **NestJS
 
 ---
 
-## Estructura del Proyecto
+## Project Structure
 
-A continuación se detalla la distribución de directorios clave del monorepositorio:
+Below is the key directory layout of the monorepo:
 
 ```
 events-manager-jalau/
-├── backend/               # Servidor de API en NestJS 11
-│   ├── prisma/            # Esquema de base de datos y migraciones de Prisma
-│   ├── src/               # Código fuente del backend (Auth, Events, Registrations, etc.)
-│   └── test/              # Pruebas de integración E2E de NestJS
-├── frontend/              # Aplicación web SPA en Angular v21 (Zoneless)
-│   ├── e2e/               # Pruebas automatizadas de interfaz de usuario con Playwright
-│   └── src/               # Componentes, servicios e layouts de Angular
-├── k6/                    # Scripts de pruebas de rendimiento y carga con k6
-├── shared/                # Modelos y contratos de TypeScript compartidos
-└── docker-compose.yml     # Orquestación local para PostgreSQL y k6
+├── backend/               # NestJS 11 API Server
+│   ├── prisma/            # Database schema and Prisma migrations
+│   ├── src/               # Backend source code (Auth, Events, Registrations, etc.)
+│   └── test/              # NestJS E2E integration tests
+├── frontend/              # Angular v21 SPA web application (Zoneless)
+│   ├── e2e/               # Automated UI testing with Playwright
+│   └── src/               # Angular components, services, and layouts
+├── k6/                    # k6 performance and load testing scripts
+├── shared/                # Shared TypeScript models and contracts
+└── docker-compose.yml     # Local orchestration for PostgreSQL and k6
 ```
 
 ---
 
-## Flujos Principales de la Aplicación
+## Main Application Flows
 
-### 1. Flujo de Autenticación con OAuth
-Muestra el proceso de inicio de sesión utilizando proveedores externos (Google o Microsoft) e inyección del token JWT en el cliente:
+### 1. OAuth Authentication Flow
+Demonstrates the login process using external identity providers (Google or Microsoft) and JWT injection in the client:
 
 ```mermaid
 sequenceDiagram
   autonumber
-  actor User as Usuario (Browser)
-  participant UI as Frontend Angular
-  participant API as Backend NestJS
-  participant Provider as Proveedor OAuth (Google/Microsoft)
+  actor User as User (Browser)
+  participant UI as Angular Frontend
+  participant API as NestJS Backend
+  participant Provider as OAuth Provider (Google/Microsoft)
 
-  User->>UI: Clic en "Login con Google/Microsoft"
-  UI->>API: Redireccionar a /auth/google o /auth/microsoft
-  API->>Provider: Redireccionar con Client ID y Scopes
-  Provider-->>User: Solicitar Credenciales y Aprobación
-  User->>Provider: Autorizar
-  Provider-->>API: Callback temporal con Código de Autorización
-  API->>Provider: Intercambiar Código por Perfil del Usuario
-  API->>API: Buscar o crear usuario (Upsert)
-  API->>API: Firmar token JWT con JWT_SECRET
-  API-->>UI: Redireccionar a /auth/callback?token=JWT_TOKEN
-  UI->>UI: Guardar JWT en localStorage ("token")
-  UI->>API: GET /auth/me (con Authorization Header)
-  API-->>UI: Retorna datos de perfil (Id, Nombre, Rol)
-  UI->>User: Redireccionar a Dashboard o Eventos (Logueado)
+  User->>UI: Click on "Login with Google/Microsoft"
+  UI->>API: Redirect to /auth/google or /auth/microsoft
+  API->>Provider: Redirect with Client ID and Scopes
+  Provider-->>User: Prompt for Credentials and Consent
+  User->>Provider: Authorize
+  Provider-->>API: Temporary callback with Authorization Code
+  API->>Provider: Exchange Authorization Code for User Profile
+  API->>API: Find or create user (Upsert)
+  API->>API: Sign JWT token with JWT_SECRET
+  API-->>UI: Redirect to /auth/callback?token=JWT_TOKEN
+  UI->>UI: Store JWT in localStorage ("token")
+  UI->>API: GET /auth/me (with Authorization Header)
+  API-->>UI: Return profile data (Id, Name, Role)
+  UI->>User: Redirect to Dashboard or Events (Logged In)
 ```
 
-### 2. Flujo de Registro a Eventos (con Lista de Espera)
-Muestra la lógica de negocio cuando un usuario se inscribe en un evento, administrando la capacidad máxima y enviando confirmaciones:
+### 2. Event Registration Flow (with Waitlist)
+Demonstrates the business logic when a user registers for an event, managing capacity limits and sending confirmation emails:
 
 ```mermaid
 sequenceDiagram
   autonumber
-  actor User as Usuario (Browser)
-  participant UI as Frontend Angular
-  participant API as Backend NestJS
-  participant DB as Base de Datos (Postgres)
-  participant Email as Servicio de Correo (Resend)
+  actor User as User (Browser)
+  participant UI as Angular Frontend
+  participant API as NestJS Backend
+  participant DB as Database (PostgreSQL)
+  participant Email as Email Service (Resend)
 
-  User->>UI: Clic en "Register" en Detalles del Evento
-  UI->>API: POST /events/:id/registrations (con Token)
-  API->>DB: Consultar Evento (Estado y Capacidad)
-  DB-->>API: Datos del Evento
-  API->>DB: Consultar si ya tiene Registro
+  User->>UI: Click "Register" on Event Details
+  UI->>API: POST /events/:id/registrations (with Token)
+  API->>DB: Retrieve Event (Status and Capacity)
+  DB-->>API: Event Data
+  API->>DB: Query if Registration exists
   DB-->>API: null
-  alt Capacidad Disponible
-      API->>DB: Crear registro con status="confirmed"
-      DB-->>API: Confirmado
-      API->>Email: Enviar correo de Confirmación (void/segundo plano)
-  else Capacidad Agotada
-      API->>DB: Contar registros confirmados para el Evento
-      API->>DB: Buscar última posición en lista de espera
-      DB-->>API: Posición N
-      API->>DB: Crear registro con status="waitlisted" y posición N+1
-      DB-->>API: En lista de espera
-      API->>Email: Enviar correo de Lista de Espera (void/segundo plano)
+  alt Capacity Available
+      API->>DB: Create registration with status="confirmed"
+      DB-->>API: Confirmed
+      API->>Email: Send Confirmation Email (void/background)
+  else Capacity Exhausted
+      API->>DB: Count confirmed registrations for the Event
+      API->>DB: Find last position on waitlist
+      DB-->>API: Position N
+      API->>DB: Create registration with status="waitlisted" and position N+1
+      DB-->>API: Waitlisted
+      API->>Email: Send Waitlist Email (void/background)
   end
-  API-->>UI: Retorna detalles de la Registración (201 Created)
-  UI->>User: Muestra "You're registered!" o posición en Lista de Espera
+  API-->>UI: Return Registration details (201 Created)
+  UI->>User: Show "You're registered!" or position on Waitlist
 ```
 
 ---
