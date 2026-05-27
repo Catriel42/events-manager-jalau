@@ -1,9 +1,10 @@
-import { Controller, Get, UseGuards, Req, Res } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Query, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { MicrosoftAuthGuard } from './guards/microsoft-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '@users/users.service';
+import { AuthService } from './auth.service';
 import type { Response } from 'express';
 import type { RequestWithUser, RequestWithJwt } from './dto/auth-payload.dto';
 
@@ -12,7 +13,29 @@ export class AuthController {
   constructor(
     private configService: ConfigService,
     private usersService: UsersService,
+    private authService: AuthService,
   ) {}
+
+  @Get('bypass')
+  async bypassAuth(
+    @Query('email') email: string,
+    @Query('name') name: string,
+  ) {
+    const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
+    if (isProduction) {
+      throw new ForbiddenException('Bypass auth is not allowed in production');
+    }
+
+    if (!email || !name) {
+      throw new BadRequestException('Email and name are required');
+    }
+
+    return this.authService.validateOAuthUser({
+      email,
+      fullName: name,
+      provider: 'mock-bypass',
+    });
+  }
 
   @Get('google')
   @UseGuards(GoogleAuthGuard)

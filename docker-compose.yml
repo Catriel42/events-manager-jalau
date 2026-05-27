@@ -11,5 +11,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  k6:
+    image: grafana/k6:latest
+    network_mode: host
+    volumes:
+      - ./k6:/scripts
+
 volumes:
   pgdata:
