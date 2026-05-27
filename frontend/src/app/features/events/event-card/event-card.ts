@@ -33,7 +33,7 @@ export class EventCard {
   getEventStatusLabel(status: EventStatus): string {
     const labels: Record<EventStatus, string> = {
       draft: 'Draft',
-      published: 'Available',
+      published: 'Upcoming',
       cancelled: 'Cancelled',
       completed: 'Finished'
     };
