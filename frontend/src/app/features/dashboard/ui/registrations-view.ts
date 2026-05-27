@@ -39,10 +39,10 @@ import { FormsModule } from '@angular/forms';
         </div>
       </div>
 
-      <!-- Registrations Table Section -->
-      <div class="bg-[var(--bg-glass)] backdrop-blur-2xl border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl">
+      <!-- Registrations Table Section - Desktop -->
+      <div class="hidden md:block bg-[var(--bg-glass)] backdrop-blur-2xl border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl">
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse min-w-[800px]">
+          <table class="w-full text-left border-collapse">
             <thead>
               <tr class="border-b border-[var(--border-color)] bg-white/5">
                 <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">User</th>
@@ -135,6 +135,96 @@ import { FormsModule } from '@angular/forms';
             </tbody>
           </table>
         </div>
+      </div>
+
+      <!-- Registrations Cards Section - Mobile -->
+      <div class="md:hidden space-y-4">
+        @if (isLoading()) {
+          @for (i of [1,2,3,4,5]; track i) {
+            <div class="bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl p-4 animate-pulse">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-white/5"></div>
+                <div class="flex-1 space-y-2">
+                  <div class="h-4 w-1/2 bg-white/5 rounded"></div>
+                  <div class="h-3 w-1/3 bg-white/5 rounded"></div>
+                </div>
+              </div>
+            </div>
+          }
+        } @else {
+          @for (reg of filteredRegistrations(); track reg.id) {
+            <div class="bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl p-4 space-y-4">
+              <div class="flex justify-between items-start gap-4">
+                <div class="flex items-center gap-3 min-w-0">
+                  @if (reg.user.avatar_url) {
+                    <img [src]="reg.user.avatar_url" class="w-10 h-10 rounded-full object-cover border border-white/10 shrink-0">
+                  } @else {
+                    <div class="w-10 h-10 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-sm shrink-0 border border-blue-500/20">
+                      {{ getInitials(reg.user.full_name) }}
+                    </div>
+                  }
+                  <div class="min-w-0">
+                    <p class="text-[var(--text-primary)] font-medium truncate">{{ reg.user.full_name }}</p>
+                    <p class="text-xs text-[var(--text-secondary)] truncate">{{ reg.user.email }}</p>
+                  </div>
+                </div>
+
+                <span
+                  class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full flex items-center gap-1.5 shrink-0"
+                  [ngClass]="{
+                    'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': reg.status === 'confirmed',
+                    'bg-amber-500/10 text-amber-400 border border-amber-500/20': reg.status === 'waitlisted',
+                    'bg-red-500/10 text-red-400 border border-red-500/20': reg.status === 'cancelled'
+                  }"
+                >
+                  {{ reg.status }}
+                  @if (reg.status === 'waitlisted' && reg.waitlist_position) {
+                    <span class="opacity-75">#{{ reg.waitlist_position }}</span>
+                  }
+                </span>
+              </div>
+
+              <div class="border-t border-[var(--border-color)] pt-3 space-y-1">
+                <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Event</p>
+                <p class="text-sm text-[var(--text-primary)] font-medium truncate">{{ reg.event.title }}</p>
+                <p class="text-xs text-[var(--text-secondary)] capitalize">{{ reg.event.event_type }}</p>
+              </div>
+
+              <div class="flex items-center justify-between border-t border-[var(--border-color)] pt-3 gap-3">
+                <div class="min-w-0">
+                  <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Registered At</p>
+                  <p class="text-xs text-[var(--text-primary)] truncate">{{ reg.registered_at | date:'mediumDate' }} • {{ reg.registered_at | date:'shortTime' }}</p>
+                </div>
+
+                <div class="flex gap-1 shrink-0">
+                  @if (reg.status !== 'confirmed') {
+                    <button (click)="updateStatus(reg, 'confirmed')" class="p-1.5 text-emerald-400 hover:bg-emerald-400/10 rounded-lg transition-colors" title="Mark Confirmed">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                  }
+                  @if (reg.status !== 'cancelled') {
+                    <button (click)="updateStatus(reg, 'cancelled')" class="p-1.5 text-amber-400 hover:bg-amber-400/10 rounded-lg transition-colors" title="Mark Cancelled">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  }
+                  <button (click)="deleteRegistration(reg)" class="p-1.5 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors" title="Delete Forever">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl p-8 text-center text-[var(--text-secondary)]">
+              No registrations found.
+            </div>
+          }
+        }
       </div>
     </div>
   `,
