@@ -23,7 +23,7 @@ import { finalize } from 'rxjs';
           <h2 class="text-xl font-bold text-[var(--text-primary)]">
             {{ event ? 'Edit Event' : 'New Event' }}
           </h2>
-          <button (click)="onClose()" class="p-2 text-[var(--text-secondary)] hover:text-white transition-colors">
+          <button (click)="onClose()" class="p-2 mr-2 text-[var(--text-secondary)] hover:text-white transition-colors">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
