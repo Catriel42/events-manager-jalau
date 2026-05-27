@@ -79,8 +79,14 @@ export default function () {
     return;
   }
 
-  // Target the first available event
-  const event = eventsData[0];
+  // Find the first event that is 'published'
+  const event = eventsData.find(e => e.status === 'published');
+  if (!event) {
+    console.warn(`[WARNING] No 'published' event found in the catalog. Registration test cannot run. Please create a published event first or run database seeds.`);
+    sleep(2);
+    return;
+  }
+  
   const eventId = event.id;
 
   // 3. Get event details
@@ -91,9 +97,13 @@ export default function () {
 
   // 4. Register to the event
   const regRes = http.post(`${BASE_URL}/events/${eventId}/registrations`, {}, { headers });
-  check(regRes, {
+  const regOk = check(regRes, {
     'registration status is 201 or 409': (r) => r.status === 201 || r.status === 409,
   });
+
+  if (!regOk) {
+    console.warn(`[DEBUG] Registration failed for event ${eventId} and user ${email}. Status: ${regRes.status}, Body: ${regRes.body}`);
+  }
 
   // 5. Unregister (clean up DB to allow test reruns)
   const unregRes = http.del(`${BASE_URL}/events/${eventId}/registrations`, null, { headers });
