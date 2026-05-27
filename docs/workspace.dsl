@@ -1,41 +1,41 @@
-workspace "Event Manager" "Monorepo para la plataforma de gestion de eventos de Jala University." {
+workspace "Event Manager" "Monorepo for the Jala University event management platform." {
 
     model {
-        user = person "Usuario Final" "Un estudiante o miembro de Jala University que busca asistir a eventos."
-        admin = person "Administrador" "Un administrador de la plataforma que gestiona los eventos, etiquetas y usuarios."
+        user = person "End User" "A student or Jala University member looking to attend events."
+        admin = person "Administrator" "A platform administrator who manages events, tags, and users."
         
-        emailSystem = softwareSystem "Sistema de Correo" "Servicio externo de Resend para el envio de notificaciones y confirmaciones." "External"
-        oauthProvider = softwareSystem "Proveedor de OAuth" "Servicios de autenticacion externa de Google y Microsoft." "External"
+        emailSystem = softwareSystem "Email System" "External Resend service for sending notifications and confirmations." "External"
+        oauthProvider = softwareSystem "OAuth Provider" "External Google and Microsoft authentication services." "External"
         
-        eventManagerSystem = softwareSystem "Event Manager System" "El sistema central de gestion de eventos, que permite ver, registrarse y administrar eventos." {
+        eventManagerSystem = softwareSystem "Event Manager System" "The core system for managing events, allowing viewing, registration, and administration." {
             
-            singlePageApplication = container "SPA Angular" "Aplicacion web cliente desarrollada con Angular v21, utilizando señales y arquitectura limpia." "Angular" "WebBrowser"
-            apiApplication = container "NestJS API" "El servidor del backend que provee la logica de negocio y endpoints RESTful." "NestJS / TypeScript"
-            database = container "Base de Datos" "Base de datos relacional para persistir los usuarios, eventos, tags y registros." "PostgreSQL (Prisma)" "Database"
+            singlePageApplication = container "Angular SPA" "Client web application built with Angular v21 using signals and clean architecture." "Angular" "WebBrowser"
+            apiApplication = container "NestJS API" "The backend server providing business logic and RESTful endpoints." "NestJS / TypeScript"
+            database = container "Database" "Relational database to persist users, events, tags, and registrations." "PostgreSQL (Prisma)" "Database"
         }
 
-        # Relaciones del Contexto
-        user -> eventManagerSystem "Visualiza eventos y se registra en ellos"
-        admin -> eventManagerSystem "Crea y administra eventos, usuarios y etiquetas"
-        eventManagerSystem -> emailSystem "Envia notificaciones de correo electronico a los usuarios"
-        eventManagerSystem -> oauthProvider "Autentica usuarios usando credenciales institucionales"
+        # Context Relationships
+        user -> eventManagerSystem "Views events and registers for them"
+        admin -> eventManagerSystem "Creates and manages events, users, and tags"
+        eventManagerSystem -> emailSystem "Sends email notifications to users"
+        eventManagerSystem -> oauthProvider "Authenticates users using institutional credentials"
 
-        # Relaciones de Contenedores
-        user -> singlePageApplication "Visualiza e interactua en el navegador"
-        admin -> singlePageApplication "Administra los paneles del Dashboard"
-        singlePageApplication -> apiApplication "Realiza peticiones HTTP API" "JSON/HTTPS"
-        apiApplication -> database "Lee y escribe datos utilizando Prisma Client" "SQL/TCP"
-        apiApplication -> oauthProvider "Valida tokens de autenticacion" "HTTPS"
-        apiApplication -> emailSystem "Envia peticiones de envio de correos" "HTTPS"
+        # Container Relationships
+        user -> singlePageApplication "Views and interacts within the web browser"
+        admin -> singlePageApplication "Manages dashboard panels"
+        singlePageApplication -> apiApplication "Makes HTTP API requests" "JSON/HTTPS"
+        apiApplication -> database "Reads from and writes to using Prisma Client" "SQL/TCP"
+        apiApplication -> oauthProvider "Validates authentication tokens" "HTTPS"
+        apiApplication -> emailSystem "Sends email delivery requests" "HTTPS"
     }
 
     views {
-        systemContext eventManagerSystem "SystemContext" "Diagrama de Contexto del Sistema Event Manager" {
+        systemContext eventManagerSystem "SystemContext" "System Context diagram for the Event Manager System" {
             include *
             autoLayout lr
         }
 
-        container eventManagerSystem "Containers" "Diagrama de Contenedores del Sistema Event Manager" {
+        container eventManagerSystem "Containers" "Container diagram for the Event Manager System" {
             include *
             autoLayout tb
         }
