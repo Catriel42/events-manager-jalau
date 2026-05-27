@@ -1,28 +1,28 @@
-# Optimizacion de Arquitectura: Redis y BullMQ
+# Architecture Optimization: Redis & BullMQ
 
-Este documento contiene la propuesta tecnica detallada, el plan de implementacion y la justificacion del uso de Redis (Cache-Aside) y BullMQ (Cola de Mensajeria) para escalar el backend del sistema de gestion de eventos.
-
----
-
-## 1. Justificacion Tecnica del Rendimiento
-
-### El Problema Actual bajo Concurrencia
-Actualmente, el backend experimenta un aumento en los tiempos de respuesta (llegando a p95 de 10 segundos) bajo una carga de 100 usuarios concurrentes debido a dos factores:
-
-1. **Saturacion del Hilo de Ejecucion (Event Loop Starvation)**:
-   Al registrarse un usuario, el servidor realiza de forma asincrona un envio de correo a traves de la API de Resend (`this.resend.emails.send()`). Aunque esta operacion no se espere en el hilo de respuesta HTTP del cliente (se ejecuta con un prefijo void), Node.js (que es monohilo) debe gestionar la conexion de red (resolucion DNS, conexion TCP y sobre todo la negociacion SSL/TLS que requiere mucho procesamiento de CPU). Al intentar abrir 100 conexiones HTTPS salientes simultaneamente, la CPU se satura resolviendo criptografia. Las consultas de base de datos normales se quedan en cola esperando turno en el Event Loop.
-2. **Agotamiento del Pool de Conexiones de Base de Datos**:
-   Prisma tiene un limite de conexiones simultaneas a la base de datos (PostgreSQL). Al recibir 100 peticiones en paralelo, la gran mayoria debe esperar en cola a que se libere una conexion, sumando segundos de latencia.
-
-### Como lo soluciona esta propuesta
-- **Redis Cache (Lecturas)**: Almacena las consultas de eventos en memoria RAM. Evita por completo realizar consultas a PostgreSQL y evita utilizar el pool de conexiones de Prisma. Las consultas toman menos de 5ms.
-- **BullMQ (Escrituras)**: En lugar de procesar los envios de correos directamente en el hilo de la API, el servidor crea el registro en PostgreSQL, ingresa una tarea liviana en la cola de Redis (toma menos de 1ms) y responde inmediatamente al cliente. El envio de correos se procesa en lotes pequeños (por ejemplo, de 5 en 5) en segundo plano por un Worker, protegiendo al procesador principal.
+This document contains the detailed technical proposal, implementation plan, and justification for integrating Redis (Cache-Aside Caching) and BullMQ (Message Queue) to scale the backend of the event management system.
 
 ---
 
-## 2. Diagramas de Flujo de la Nueva Arquitectura
+## 1. Technical Justification
 
-### Arquitectura General (Lecturas y Escrituras)
+### The Current Concurrency Bottleneck
+Currently, the backend experiences increased response times (reaching p95 of 10 seconds) under a load of 100 concurrent users due to two factors:
+
+1. **Event Loop Starvation (Single-Thread Blockage)**:
+   When a user registers, the server triggers an email dispatch using the Resend API (`this.resend.emails.send()`). Although this operation is not awaited in the main HTTP request loop (it runs with a `void` prefix), Node.js (which is single-threaded) must still manage the network connection (DNS resolution, TCP connection, and especially the SSL/TLS cryptographic handshake which is CPU-intensive). Attempting to open 100 HTTPS connections simultaneously saturates the CPU. As a result, database queries and other simple HTTP requests wait in line in the Event Loop queue.
+2. **Database Connection Pool Exhaustion**:
+   Prisma has a limit on concurrent connections to the database (PostgreSQL). When 100 requests arrive at the same time, most must wait in a queue for a connection to be freed, adding latency.
+
+### How this Proposal Solves it
+- **Redis Cache (Reads)**: Stores event queries in memory. It completely avoids querying PostgreSQL and using the Prisma connection pool. Read queries resolve in under 5ms.
+- **BullMQ (Writes)**: Instead of processing email dispatches directly in the API process loop, the server creates the record in PostgreSQL, pushes a lightweight job to the Redis queue (takes less than 1ms), and responds immediately to the client. The email sending is handled in small concurrent batches (e.g., 5 at a time) in the background by a Worker.
+
+---
+
+## 2. New Architecture Flowcharts
+
+### General Architecture (Reads & Writes)
 
 ```mermaid
 graph TD
@@ -55,68 +55,68 @@ graph TD
 
 ---
 
-### Flujo Detallado de Lecturas (GET)
+### Detailed Read Flow (GET)
 
-#### Escenario A: Primera vez que se consulta un evento (Fallo de Cache / Cache Miss)
+#### Scenario A: First time an event is requested (Cache Miss)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Cliente as Cliente (Navegador)
-    participant Servidor as Servidor NestJS
+    actor Client as Client (Browser)
+    participant Server as NestJS Server
     participant Redis as Redis (RAM)
-    participant Postgres as PostgreSQL (Disco)
+    participant Postgres as PostgreSQL (Disk)
 
-    Cliente->>Servidor: GET /events/123
-    Servidor->>Redis: Buscar "event:123"
-    Redis-->>Servidor: No existe (Cache Miss)
-    Servidor->>Postgres: SELECT * FROM events WHERE id=123
-    Postgres-->>Servidor: Datos del evento (15ms)
-    Servidor->>Redis: Guardar "event:123" (TTL 5 minutos)
-    Servidor-->>Cliente: Enviar evento (200 OK)
+    Client->>Server: GET /events/123
+    Server->>Redis: Query "event:123"
+    Redis-->>Server: Key does not exist (Cache Miss)
+    Server->>Postgres: SELECT * FROM events WHERE id=123
+    Postgres-->>Server: Event data (15ms)
+    Server->>Redis: Save "event:123" (TTL 5 minutes)
+    Server-->>Client: Return event (200 OK)
 ```
 
-#### Escenario B: Consultas posteriores del mismo evento (Acierto de Cache / Cache Hit)
+#### Scenario B: Subsequent queries for the same event (Cache Hit)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Cliente as Cliente (Navegador)
-    participant Servidor as Servidor NestJS
+    actor Client as Client (Browser)
+    participant Server as NestJS Server
     participant Redis as Redis (RAM)
-    participant Postgres as PostgreSQL (Disco)
+    participant Postgres as PostgreSQL (Disk)
 
-    Cliente->>Servidor: GET /events/123
-    Servidor->>Redis: Buscar "event:123"
-    Redis-->>Servidor: Retorna datos del evento (Cache Hit)
-    Servidor-->>Cliente: Enviar evento (2ms)
+    Client->>Server: GET /events/123
+    Server->>Redis: Query "event:123"
+    Redis-->>Server: Return event data (Cache Hit)
+    Server-->>Client: Return event (2ms)
 ```
 
-#### Escenario C: Actualizacion del evento e invalidacion
+#### Scenario C: Event update and invalidation
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Admin as Administrador
-    participant Servidor as Servidor NestJS
+    actor Admin as Administrator
+    participant Server as NestJS Server
     participant Redis as Redis (RAM)
-    participant Postgres as PostgreSQL (Disco)
+    participant Postgres as PostgreSQL (Disk)
 
-    Admin->>Servidor: PUT /events/123 (Actualizar titulo)
-    Servidor->>Postgres: UPDATE events SET title="..." WHERE id=123
-    Postgres-->>Servidor: Exito
-    Servidor->>Redis: BORRAR "event:123" (Invalidar Cache)
-    Servidor-->>Admin: Guardado (200 OK)
+    Admin->>Server: PUT /events/123 (Update title)
+    Server->>Postgres: UPDATE events SET title="..." WHERE id=123
+    Postgres-->>Server: Success
+    Server->>Redis: DELETE "event:123" (Invalidate Cache)
+    Server-->>Admin: Saved (200 OK)
 ```
 
 ---
 
-## 3. Plan de Implementacion Paso a Paso
+## 3. Step-by-Step Implementation Plan
 
-### Infraestructura
+### Infrastructure
 
-1. **Modificar docker-compose.yml**
-   Añadir el servicio de Redis en el archivo de orquestacion local:
+1. **Modify docker-compose.yml**
+   Add the Redis service to your local compose file:
    ```yaml
    redis:
      image: redis:7-alpine
@@ -126,46 +126,46 @@ sequenceDiagram
      volumes:
        - redisdata:/data
    ```
-2. **Variables de Entorno**
-   Añadir en `backend/.env` y `backend/.env.example`:
+2. **Environment Variables**
+   Add these to `backend/.env` and `backend/.env.example`:
    ```env
    REDIS_HOST=localhost
    REDIS_PORT=6379
-   REDIS_URL= # Opcional en local, requerido para produccion (ej. Upstash/Redis Cloud)
+   REDIS_URL= # Optional locally, required in production (e.g., Upstash/Redis Cloud)
    ```
-3. **Validacion de Configuracion**
-   Modificar `backend/src/common/config/env.validation.ts` para agregar y validar `REDIS_HOST` y `REDIS_PORT`.
+3. **Configuration Validation**
+   Modify `backend/src/common/config/env.validation.ts` to validate `REDIS_HOST` and `REDIS_PORT`.
 
-### Dependencias
+### Dependencies
 
-En la carpeta `backend/` ejecutar la instalacion de paquetes:
+From the `backend/` directory, run the package installations:
 ```bash
 npm install @nestjs/cache-manager cache-manager cache-manager-redis-yet @nestjs/bullmq bullmq ioredis
 ```
 
-### Codigo del Backend
+### Backend Code
 
-1. **Configuracion Global (`app.module.ts`)**
-   - Importar `CacheModule` globalmente utilizando `cache-manager-redis-yet` apuntando a las variables de entorno.
-   - Importar `BullModule` apuntando a la conexion de Redis.
-2. **Implementar Cache-Aside (`events.service.ts`)**
-   - Inyectar `CACHE_MANAGER`.
-   - Modificar `findAll` and `findById` para leer de Redis primero. Si hay fallo de cache, leer de la base de datos, escribir en Redis con un TTL de 300 segundos (5 minutos) y retornar.
-   - Modificar `create`, `update` y `delete` para borrar las claves afectadas de Redis.
-3. **Colas de Mensajeria (`registrations.module.ts` y `registrations.service.ts`)**
-   - Registrar la cola `'mail-queue'` en `registrations.module.ts`.
-   - Inyectar la cola en `registrations.service.ts` usando `@InjectQueue('mail-queue') private mailQueue: Queue`.
-   - Modificar el metodo `register()` para que, en lugar de llamar de forma directa a la funcion de correo, llame a `this.mailQueue.add('send-confirmation', { eventId, userId, registrationId })`.
-4. **Procesador de Colas (`mail.processor.ts`)**
-   - Crear el archivo `backend/src/notifications/mail.processor.ts` con el decorador `@Processor('mail-queue')`.
-   - El procesador ejecutara el metodo `process(job)` llamando internamente a `NotificationsService.sendRegistrationConfirmation(...)` de forma secuencial o controlada (con limites de concurencia).
-5. **Exportaciones (`notifications.module.ts`)**
-   - Exportar `NotificationsService` y registrar `MailProcessor` como proveedor.
+1. **Global Configuration (`app.module.ts`)**
+   - Globally import `CacheModule` utilizing `cache-manager-redis-yet` pointing to your environment variables.
+   - Globally import `BullModule` pointing to your Redis connection.
+2. **Implement Cache-Aside Caching (`events.service.ts`)**
+   - Inject `CACHE_MANAGER`.
+   - Update `findAll` and `findById` to check Redis first. On cache miss, query Postgres, save it in Redis with a 300-second TTL (5 minutes), and return.
+   - Update `create`, `update`, and `delete` to delete the affected cache keys in Redis.
+3. **Message Queues (`registrations.module.ts` & `registrations.service.ts`)**
+   - Register `'mail-queue'` in `registrations.module.ts`.
+   - Inject the queue in `registrations.service.ts` using `@InjectQueue('mail-queue') private mailQueue: Queue`.
+   - Update the `register()` method to call `await this.mailQueue.add('send-confirmation', { eventId, userId, registrationId })` instead of directly triggering the email service.
+4. **Queue Processor (`mail.processor.ts`)**
+   - Create `backend/src/notifications/mail.processor.ts` decorated with `@Processor('mail-queue')`.
+   - Implement `process(job)` which extracts metadata and triggers `NotificationsService.sendRegistrationConfirmation(...)` asynchronously.
+5. **Exports (`notifications.module.ts`)**
+   - Export `NotificationsService` and register the new `MailProcessor` provider.
 
 ---
 
-## 4. Despliegue Gratuito en Produccion (Vercel, Render y Supabase)
+## 4. Free Production Deployment (Vercel, Render, & Supabase)
 
-- **Redis en la nube**: Al estar en Vercel/Render en planes gratuitos, no se puede correr Redis en el mismo servidor de Render de forma persistente. Se debe crear una instancia gratuita de Redis en la nube usando proveedores como Upstash o Redis Labs (que ofrecen hasta 10,000 llamadas al dia o 30MB en planes gratuitos).
-- **Render Variable**: Agregar la variable de entorno `REDIS_URL` en la configuracion de Render apuntando a tu instancia de Upstash.
-- **Mantener Vivo el Servidor (Cron Job)**: El cron job de 9 minutos que ya tienes funcionando seguira activo y mantendra encendido el servidor NestJS de Render, garantizando que el Worker de BullMQ procese las colas constantemente sin suspenderse.
+- **Cloud Redis**: Because you are on Vercel/Render free tiers, you cannot run persistent Redis on Render free instances. You should create a free Redis database in the cloud using **Upstash** or **Redis Labs** (which offer up to 10,000 requests per day or 30MB of storage on their free tiers).
+- **Render Variables**: Add the `REDIS_URL` environment variable in the Render Dashboard pointing to your cloud instance.
+- **Keep-Alive Cron**: Your existing 9-minute cron job keeping your Render backend active will ensure the BullMQ Worker background processes continue running and handling queue items without getting suspended.
