@@ -84,3 +84,37 @@ This project follows strict conventions defined in [AGENTS.md](./AGENTS.md).
 ## CI/CD
 A GitHub Actions pipeline is configured to validate every Pull Request.
 - **Jobs**: Backend (Lint, Build, Test), Frontend (Build).
+
+---
+
+## Testing
+
+The project is equipped with automated end-to-end (E2E) UI testing and high-concurrency API load testing.
+
+### 1. E2E UI Testing (Playwright)
+
+We use Playwright within the frontend directory to validate the user interface. It simulates standard user journeys (e.g., viewing catalog, inspecting event details, registering, syncing calendars, and cancelling) using mock API responses.
+
+**Commands (run from the `frontend/` directory):**
+- **Headless execution** (fast CLI test run):
+  ```bash
+  npm run test:e2e
+  ```
+- **Interactive UI Runner** (opens a graphical dashboard to view browser clicks, timelines, and console logs):
+  ```bash
+  npm run test:e2e:ui
+  ```
+
+### 2. Load and Performance Testing (k6)
+
+We use k6 to stress test the NestJS API and the database under high concurrency. It simulates up to 100+ Virtual Users (VUs) simultaneously executing authentication bypass, catalog browsing, event detail loading, and registration.
+
+**Prerequisites:**
+- Local PostgreSQL Docker container is running.
+- Local backend is running (`cd backend && npm run start:dev`).
+
+**Command (run from the root directory):**
+```bash
+docker compose run --rm k6 run /scripts/load-test.js
+```
+*(This starts a temporary k6 container that hooks directly into your local machine's `localhost:3000` port using host-network bridging, keeping your system clean).*
