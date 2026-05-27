@@ -96,6 +96,41 @@ sequenceDiagram
   UI->>User: Show "You're registered!" or position on Waitlist
 ```
 
+### 3. Calendar Synchronization Flow
+Demonstrates how a user registers and syncs an event to their Google or Microsoft Calendar, avoiding duplicates:
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as User (Browser)
+  participant UI as Angular Frontend
+  participant API as NestJS Backend
+  participant DB as Database (PostgreSQL)
+  participant Provider as Calendar Provider (Google/Outlook)
+
+  User->>UI: Click "Add to Google/Outlook Calendar" on Event Details
+  UI->>API: POST /events/:id/sync-calendar (with Token)
+  API->>DB: Check if Registration exists for User/Event
+  DB-->>API: Registration Data
+  alt Registration not found
+      API-->>UI: Return 400 Bad Request
+  else User registered
+      API->>DB: Get full user details and OAuth tokens
+      DB-->>API: Full User Record
+      alt calendar_event_id already exists
+          API->>Provider: Update existing calendar event (calendar_event_id)
+          Provider-->>API: Update confirmation
+      else calendar_event_id does not exist
+          API->>Provider: Create new calendar event
+          Provider-->>API: External Event ID & URL
+          API->>DB: Save calendar_event_id to Registration
+          DB-->>API: Saved
+      end
+      API-->>UI: Return { url } (201 Created)
+      UI->>User: Open or display calendar event URL / confirmation
+  end
+```
+
 ---
 
 ## Backend API Reference
