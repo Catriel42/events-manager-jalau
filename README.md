@@ -98,6 +98,378 @@ sequenceDiagram
 
 ---
 
+## Backend API Reference
+
+Base URL in local development: `http://localhost:3000`
+
+### 1. Authentication (`/auth`)
+
+#### `GET /auth/google`
+* **Access**: Public
+* **Description**: Initiates Google OAuth consent screen redirect.
+
+#### `GET /auth/google/callback`
+* **Access**: Public
+* **Description**: Receives authorization code from Google, processes upsert, and redirects browser to the frontend with the access token.
+
+#### `GET /auth/microsoft`
+* **Access**: Public
+* **Description**: Initiates Microsoft OAuth consent screen redirect.
+
+#### `GET /auth/microsoft/callback`
+* **Access**: Public
+* **Description**: Receives authorization code from Microsoft, processes upsert, and redirects browser to the frontend with the access token.
+
+#### `GET /auth/me`
+* **Access**: Authenticated (JWT Bearer)
+* **Response (200 OK)**:
+  ```json
+  {
+    "id": "b3c9f28d-12ab-34cd-56ef-7890abcdef12",
+    "full_name": "John Doe",
+    "email": "john.doe@jala.university",
+    "avatar_url": "https://example.com/avatar.jpg",
+    "provider": "google",
+    "role": "user",
+    "created_at": "2026-05-25T12:00:00.000Z",
+    "updated_at": "2026-05-25T12:00:00.000Z"
+  }
+  ```
+
+#### `GET /auth/bypass`
+* **Access**: Development Only (Blocked in Production)
+* **Query Parameters**:
+  * `email` (string, required) - Mock email address.
+  * `name` (string, required) - Mock user full name.
+* **Response (200 OK)**:
+  ```json
+  {
+    "user": {
+      "id": "b3c9f28d-12ab-34cd-56ef-7890abcdef12",
+      "full_name": "John Doe",
+      "email": "john.doe@jala.university",
+      "avatar_url": null,
+      "provider": "mock-bypass",
+      "role": "user",
+      "created_at": "2026-05-25T12:00:00.000Z",
+      "updated_at": "2026-05-25T12:00:00.000Z"
+    },
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+  ```
+
+---
+
+### 2. Events (`/events`)
+
+#### `GET /events`
+* **Access**: Public
+* **Query Parameters**:
+  * `page` (number, optional, default: 1)
+  * `limit` (number, optional, default: 10)
+  * `includeAll` (string, optional, default: 'false') - If 'true', includes drafts and cancelled events.
+* **Response (200 OK)**:
+  ```json
+  {
+    "data": [
+      {
+        "id": "e5c6a1d8-4321-abcd-ef01-23456789abcd",
+        "title": "Introduction to AI Agent Systems",
+        "description": "Learn how to build autonomous agentic workflows...",
+        "location": "Jala University Main Auditorium",
+        "meeting_url": null,
+        "event_type": "in_person",
+        "status": "published",
+        "starts_at": "2026-06-01T14:00:00.000Z",
+        "ends_at": "2026-06-01T17:00:00.000Z",
+        "capacity": 50,
+        "banner_url": null,
+        "calendar_uid": "uid-ai-agents-2026",
+        "created_at": "2026-05-25T12:00:00.000Z",
+        "updated_at": "2026-05-25T12:00:00.000Z",
+        "tags": [
+          { "id": "tag-1", "name": "AI", "slug": "ai" }
+        ]
+      }
+    ],
+    "meta": {
+      "total": 1,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 1
+    }
+  }
+  ```
+
+#### `GET /events/my`
+* **Access**: Authenticated (JWT Bearer)
+* **Query Parameters**:
+  * `status` (string, optional) - Filter by event status ('draft', 'published', 'cancelled', 'completed').
+  * `page` (number, optional, default: 1)
+  * `limit` (number, optional, default: 10)
+* **Response (200 OK)**: Same structure as `GET /events`.
+
+#### `GET /events/:id`
+* **Access**: Public
+* **Response (200 OK)**:
+  ```json
+  {
+    "id": "e5c6a1d8-4321-abcd-ef01-23456789abcd",
+    "title": "Introduction to AI Agent Systems",
+    "description": "Learn how to build autonomous agentic workflows...",
+    "location": "Jala University Main Auditorium",
+    "meeting_url": null,
+    "event_type": "in_person",
+    "status": "published",
+    "starts_at": "2026-06-01T14:00:00.000Z",
+    "ends_at": "2026-06-01T17:00:00.000Z",
+    "capacity": 50,
+    "banner_url": null,
+    "calendar_uid": "uid-ai-agents-2026",
+    "created_at": "2026-05-25T12:00:00.000Z",
+    "updated_at": "2026-05-25T12:00:00.000Z",
+    "tags": [
+      { "id": "tag-1", "name": "AI", "slug": "ai" }
+    ],
+    "registered_count": 5
+  }
+  ```
+
+#### `POST /events`
+* **Access**: Admin (JWT Bearer)
+* **Request Body**:
+  ```json
+  {
+    "title": "Introduction to AI Agent Systems",
+    "description": "Learn how to build autonomous agentic workflows...",
+    "location": "Jala University Main Auditorium",
+    "event_type": "in_person",
+    "starts_at": "2026-06-01T14:00:00.000Z",
+    "ends_at": "2026-06-01T17:00:00.000Z",
+    "capacity": 50,
+    "tag_ids": ["tag-1-uuid"]
+  }
+  ```
+* **Response (201 Created)**: Created event object with its tags array.
+
+#### `PUT /events/:id`
+* **Access**: Admin (JWT Bearer)
+* **Request Body**: Partial event details (identical format to `POST /events` body).
+* **Response (200 OK)**: Updated event object with its tags array.
+
+#### `DELETE /events/:id`
+* **Access**: Admin (JWT Bearer)
+* **Response (200 OK)**:
+  ```json
+  {
+    "success": true
+  }
+  ```
+
+#### `POST /events/:id/sync-calendar`
+* **Access**: Authenticated (JWT Bearer)
+* **Response (201 Created)**:
+  ```json
+  {
+    "url": "https://calendar.google.com/calendar/r/eventedit?..."
+  }
+  ```
+
+---
+
+### 3. Event Registrations (`/events/:eventId/registrations`)
+
+#### `POST /events/:eventId/registrations`
+* **Access**: Authenticated (JWT Bearer)
+* **Response (201 Created)**:
+  ```json
+  {
+    "id": "reg-9876-uuid",
+    "event_id": "e5c6a1d8-4321-abcd-ef01-23456789abcd",
+    "user_id": "b3c9f28d-12ab-34cd-56ef-7890abcdef12",
+    "status": "confirmed",
+    "waitlist_position": null,
+    "token": "registration-verification-token-uuid",
+    "calendar_event_id": null,
+    "registered_at": "2026-05-27T01:00:00.000Z",
+    "cancelled_at": null
+  }
+  ```
+  *Note: If the capacity is exhausted, the status returns `'waitlisted'` and the `waitlist_position` will be a number.*
+
+#### `GET /events/:eventId/registrations`
+* **Access**: Authenticated (JWT Bearer)
+* **Response (200 OK)**: Returns the user's registration object (same schema as `POST` response above) or `null` if not registered.
+
+#### `DELETE /events/:eventId/registrations`
+* **Access**: Authenticated (JWT Bearer)
+* **Response (200 OK)**: Empty body.
+
+#### `GET /events/:eventId/registrations/all`
+* **Access**: Admin (JWT Bearer)
+* **Response (200 OK)**:
+  ```json
+  [
+    {
+      "id": "reg-9876-uuid",
+      "status": "confirmed",
+      "user_id": "user-id-uuid",
+      "event_id": "event-id-uuid",
+      "user": {
+        "id": "user-id-uuid",
+        "full_name": "John Doe",
+        "email": "john.doe@jala.university",
+        "avatar_url": null
+      }
+    }
+  ]
+  ```
+
+---
+
+### 4. Global Registrations (`/registrations`)
+
+#### `GET /registrations`
+* **Access**: Admin (JWT Bearer)
+* **Response (200 OK)**:
+  ```json
+  [
+    {
+      "id": "reg-uuid",
+      "event_id": "event-uuid",
+      "user_id": "user-uuid",
+      "status": "confirmed",
+      "waitlist_position": null,
+      "token": "token-uuid",
+      "registered_at": "2026-05-27T01:00:00.000Z",
+      "user": {
+        "id": "user-uuid",
+        "full_name": "John Doe",
+        "email": "john@example.com",
+        "avatar_url": null
+      },
+      "event": {
+        "id": "event-uuid",
+        "title": "AI Event",
+        "starts_at": "2026-06-01T14:00:00.000Z",
+        "event_type": "in_person"
+      }
+    }
+  ]
+  ```
+
+#### `PATCH /registrations/:id/status`
+* **Access**: Admin (JWT Bearer)
+* **Request Body**:
+  ```json
+  {
+    "status": "confirmed"
+  }
+  ```
+* **Response (200 OK)**: Updated global registration object.
+
+#### `DELETE /registrations/:id`
+* **Access**: Admin (JWT Bearer)
+* **Response (200 OK)**: Empty body.
+
+---
+
+### 5. Tags (`/tags`)
+
+#### `GET /tags`
+* **Access**: Public
+* **Response (200 OK)**:
+  ```json
+  [
+    {
+      "id": "tag-id-1",
+      "name": "AI",
+      "slug": "ai"
+    }
+  ]
+  ```
+
+#### `GET /tags/:id`
+* **Access**: Public
+* **Response (200 OK)**: Tag object details.
+
+#### `POST /tags`
+* **Access**: Admin (JWT Bearer)
+* **Request Body**:
+  ```json
+  {
+    "name": "New Tag",
+    "slug": "new-tag"
+  }
+  ```
+* **Response (201 Created)**: Created tag object.
+
+#### `PATCH /tags/:id`
+* **Access**: Admin (JWT Bearer)
+* **Request Body**: Partial tag details (name, slug).
+* **Response (200 OK)**: Updated tag object.
+
+#### `DELETE /tags/:id`
+* **Access**: Admin (JWT Bearer)
+* **Response (200 OK)**: Deleted tag object details.
+
+---
+
+### 6. Users (`/users`)
+
+#### `GET /users`
+* **Access**: Admin (JWT Bearer)
+* **Response (200 OK)**: Array of all registered user objects.
+
+#### `GET /users/:id`
+* **Access**: Admin (JWT Bearer)
+* **Response (200 OK)**: Specific user object details.
+
+#### `PATCH /users/:id`
+* **Access**: Admin (JWT Bearer)
+* **Request Body**:
+  ```json
+  {
+    "role": "admin"
+  }
+  ```
+* **Response (200 OK)**: Updated user object.
+
+#### `DELETE /users/:id`
+* **Access**: Admin (JWT Bearer)
+* **Response (200 OK)**: Deleted user object details.
+
+---
+
+### 7. File Uploads (`/files`)
+
+#### `POST /files/upload`
+* **Access**: Public
+* **Request Body**: `multipart/form-data` with `file` key containing the image file.
+* **Response (201 Created)**:
+  ```json
+  {
+    "url": "https://res.cloudinary.com/ds9u5rzqv/image/upload/v1234/filename.jpg",
+    "public_id": "filename_public_id"
+  }
+  ```
+
+---
+
+### 8. Health Check (`/health`)
+
+#### `GET /health`
+* **Access**: Public
+* **Response (200 OK)**:
+  ```json
+  {
+    "status": "ok",
+    "timestamp": "2026-05-27T01:00:00.000Z"
+  }
+  ```
+
+---
+
 ## Prerequisites
 
 Ensure you have the following installed:
