@@ -1,4 +1,12 @@
-import { Controller, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { RegistrationsService } from './registrations.service';
 import { AdminGuard } from '../events/guards/admin.guard';
 import { RegistrationStatus } from '@prisma/client';

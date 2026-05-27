@@ -1,4 +1,12 @@
-import { Controller, Get, Patch, Param, Delete, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Param,
+  Delete,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AdminGuard } from '../events/guards/admin.guard';
 import { UpdateUserDto } from './dto/update-user.dto';

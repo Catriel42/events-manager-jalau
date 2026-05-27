@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
@@ -9,9 +13,9 @@ export class TagsService {
 
   async create(createTagDto: CreateTagDto) {
     const slug = createTagDto.slug || this.generateSlug(createTagDto.name);
-    
+
     const existing = await this.prisma.tag.findFirst({
-      where: { OR: [{ name: createTagDto.name }, { slug }] }
+      where: { OR: [{ name: createTagDto.name }, { slug }] },
     });
 
     if (existing) {
@@ -60,7 +64,9 @@ export class TagsService {
       });
 
       if (existing) {
-        throw new ConflictException('Tag with this name or slug already exists');
+        throw new ConflictException(
+          'Tag with this name or slug already exists',
+        );
       }
     }
 
