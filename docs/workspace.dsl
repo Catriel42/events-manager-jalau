@@ -5,7 +5,7 @@ workspace "Event Manager" "Monorepo for the Jala University event management pla
         admin = person "Administrator" "A platform administrator who manages events, tags, and users."
         
         emailSystem = softwareSystem "Email System" "External Resend service for sending notifications and confirmations." "External"
-        oauthProvider = softwareSystem "OAuth Provider" "External Google and Microsoft authentication services." "External"
+        oauthProvider = softwareSystem "OAuth Provider" "External Google authentication services." "External"
         
         eventManagerSystem = softwareSystem "Event Manager System" "The core system for managing events, allowing viewing, registration, and administration." {
             

@@ -36,7 +36,7 @@ events-manager-jalau/
 ## Main Application Flows
 
 ### 1. OAuth Authentication Flow
-Demonstrates the login process using external identity providers (Google or Microsoft) and JWT injection in the client:
+Demonstrates the login process using Google OAuth and JWT injection in the client:
 
 ```mermaid
 sequenceDiagram
@@ -44,10 +44,10 @@ sequenceDiagram
   actor User as User (Browser)
   participant UI as Angular Frontend
   participant API as NestJS Backend
-  participant Provider as OAuth Provider (Google/Microsoft)
+  participant Provider as OAuth Provider (Google)
 
-  User->>UI: Click on "Login with Google/Microsoft"
-  UI->>API: Redirect to /auth/google or /auth/microsoft
+  User->>UI: Click on "Login with Google"
+  UI->>API: Redirect to /auth/google
   API->>Provider: Redirect with Client ID and Scopes
   Provider-->>User: Prompt for Credentials and Consent
   User->>Provider: Authorize
@@ -97,7 +97,7 @@ sequenceDiagram
 ```
 
 ### 3. Calendar Synchronization Flow
-Demonstrates how a user registers and syncs an event to their Google or Microsoft Calendar, avoiding duplicates:
+Demonstrates how a user registers and syncs an event to their Google Calendar, avoiding duplicates:
 
 ```mermaid
 sequenceDiagram
@@ -106,9 +106,9 @@ sequenceDiagram
   participant UI as Angular Frontend
   participant API as NestJS Backend
   participant DB as Database (PostgreSQL)
-  participant Provider as Calendar Provider (Google/Outlook)
+  participant Provider as Calendar Provider (Google)
 
-  User->>UI: Click "Add to Google/Outlook Calendar" on Event Details
+  User->>UI: Click "Add to Google Calendar" on Event Details
   UI->>API: POST /events/:id/sync-calendar (with Token)
   API->>DB: Check if Registration exists for User/Event
   DB-->>API: Registration Data
@@ -146,14 +146,6 @@ Base URL in local development: `http://localhost:3000`
 #### `GET /auth/google/callback`
 * **Access**: Public
 * **Description**: Receives authorization code from Google, processes upsert, and redirects browser to the frontend with the access token.
-
-#### `GET /auth/microsoft`
-* **Access**: Public
-* **Description**: Initiates Microsoft OAuth consent screen redirect.
-
-#### `GET /auth/microsoft/callback`
-* **Access**: Public
-* **Description**: Receives authorization code from Microsoft, processes upsert, and redirects browser to the frontend with the access token.
 
 #### `GET /auth/me`
 * **Access**: Authenticated (JWT Bearer)
