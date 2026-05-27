@@ -131,7 +131,7 @@
         @if (evt.description) {
           <div class="border-t border-[var(--border-color)] pt-8">
             <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-4">About this event</h2>
-            <div class="prose prose-invert max-w-none text-[var(--text-secondary)] leading-relaxed" [innerHTML]="evt.description"></div>
+            <div class="prose prose-invert max-w-none text-[var(--text-secondary)] leading-relaxed whitespace-pre-line" [innerHTML]="evt.description"></div>
           </div>
         }
 
