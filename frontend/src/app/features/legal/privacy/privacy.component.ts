@@ -20,31 +20,36 @@ import { RouterLink } from '@angular/router';
       <div class="space-y-6 text-[var(--text-secondary)] leading-relaxed">
         <section>
           <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-3">1. Information Collection</h2>
-          <p>We collect information you provide directly to us when using Event Manager JalaU, including your name, email address, and profile picture provided through Google or Microsoft OAuth.</p>
+          <p>We collect information you provide directly to us when using Event Manager JalaU, including your name, email address, and profile picture provided through Google OAuth.</p>
         </section>
 
         <section>
           <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-3">2. Calendar Access</h2>
-          <p>Our application requests access to your Google or Microsoft Calendar events. This permission is used exclusively to:</p>
+          <p>Our application requests access to your Google Calendar events. This permission is used exclusively to:</p>
           <ul class="list-disc ml-6 mt-2 space-y-2">
-            <li>Sync university events to your personal calendar.</li>
-            <li>Create event entries on your behalf when you click the synchronization button.</li>
+            <li>Sync university events to your personal Google Calendar.</li>
+            <li>Create, update, or cancel event entries on your behalf when you choose to synchronize an event.</li>
           </ul>
-          <p class="mt-2 font-medium text-blue-400">We do not read, modify, or delete any of your pre-existing personal events.</p>
+          <p class="mt-2 font-medium text-blue-400">We do not read, modify, or delete any of your pre-existing personal calendar events. We only manage events created by this application.</p>
         </section>
 
         <section>
-          <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-3">3. Data Usage</h2>
-          <p>The data we collect is used solely to manage your registrations and provide the calendar integration service. We do not sell or share your personal data with third parties.</p>
+          <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-3">3. Data Sharing, Transfer, and Disclosure</h2>
+          <p>We do not sell, rent, trade, share, transfer, or disclose Google user data (or any other personal data collected through our service) to any third parties. Your data is used strictly to provide and improve the event management and calendar synchronization services, in full compliance with the Google API Services User Data Policy.</p>
         </section>
 
         <section>
-          <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-3">4. Data Security</h2>
-          <p>We implement professional security measures, including OAuth2 encryption and secure token storage, to protect your authentication data.</p>
+          <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-3">4. Data Retention and Deletion</h2>
+          <p>We retain your profile information and event registration data only for as long as your account remains active or as needed to provide you with our services. If you wish to delete your account or request the permanent deletion of all your collected data (including your profile information and Google OAuth tokens), you can contact us at <a href="mailto:event@events-jalau.me" class="text-blue-400 hover:underline">event@events-jalau.me</a>. Deletion requests are processed and completed within 30 days, after which your data is permanently purged from our active systems.</p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-3">5. Data Security</h2>
+          <p>We implement professional industry-standard security measures, including HTTPS encryption, secure OAuth2 protocols, and encrypted database storage for access/refresh tokens, to protect your data from unauthorized access, alteration, or destruction.</p>
         </section>
 
         <footer class="pt-8 border-t border-[var(--border-color)] mt-8">
-          <p class="text-sm">Last updated: May 7, 2026</p>
+          <p class="text-sm">Last updated: May 28, 2026</p>
         </footer>
       </div>
     </div>

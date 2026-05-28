@@ -25,12 +25,12 @@ import { RouterLink } from '@angular/router';
 
         <section>
           <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-3">2. User Account</h2>
-          <p>You must use your institutional or personal account via Google/Microsoft OAuth to access certain features. You are responsible for maintaining the security of your authentication.</p>
+          <p>You must use your institutional or personal account via Google OAuth to access certain features. You are responsible for maintaining the security of your authentication.</p>
         </section>
 
         <section>
           <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-3">3. Calendar Integration</h2>
-          <p>The calendar sync feature is provided "as is". While we strive for accuracy, we are not responsible for any issues arising from third-party API service interruptions (Google/Microsoft).</p>
+          <p>The calendar sync feature is provided "as is". While we strive for accuracy, we are not responsible for any issues arising from third-party API service interruptions (Google).</p>
         </section>
 
         <section>
