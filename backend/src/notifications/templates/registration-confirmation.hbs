@@ -5,56 +5,109 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registration Confirmation</title>
 </head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 0;">
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;padding:48px 0;width:100%;">
     <tr>
       <td align="center">
-        <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-          <!-- Header -->
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.05);border:1px solid #e2e8f0;width:600px;max-width:600px;">
+          <!-- Header Banner -->
           <tr>
-            <td style="background:#1e1b4b;padding:32px 40px;text-align:center;">
-              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;">Events Manager</h1>
+            <td style="padding:0;margin:0;">
+              <img src="{{frontendUrl}}/banner_cropped.png" alt="Jala University Events" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;margin:0;" />
             </td>
           </tr>
-          <!-- Body -->
+          <!-- Body Content -->
           <tr>
-            <td style="padding:40px;">
+            <td style="padding:40px 32px;">
               {{#if isWaitlisted}}
-                <h2 style="margin:0 0 8px;color:#1e1b4b;font-size:20px;">You're on the waitlist!</h2>
-                <p style="color:#6b7280;font-size:15px;margin:0 0 24px;">
-                  Hi <strong>{{name}}</strong>, you've been added to the waitlist for <strong>{{eventTitle}}</strong>.
-                  You are currently at position <strong>#{{waitlistPosition}}</strong>.
-                  We'll notify you automatically if a spot opens up.
+                <h1 style="margin:0 0 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:24px;font-weight:700;color:#0f172a;">You're on the waitlist</h1>
+                <p style="margin:0 0 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#475569;">
+                  Hi <strong>{{name}}</strong>,<br><br>
+                  You have been added to the waitlist for <a href="{{eventUrl}}" style="color:#004dff;text-decoration:none;font-weight:700;">{{eventTitle}}</a>. 
+                  Your current queue position is <strong style="color:#004dff;">#{{waitlistPosition}}</strong>. We will notify you automatically as soon as a spot opens up.
                 </p>
               {{else}}
-                <h2 style="margin:0 0 8px;color:#1e1b4b;font-size:20px;">You're registered! 🎉</h2>
-                <p style="color:#6b7280;font-size:15px;margin:0 0 24px;">
-                  Hi <strong>{{name}}</strong>, your spot for <strong>{{eventTitle}}</strong> is confirmed.
-                  See you there!
+                <h1 style="margin:0 0 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:24px;font-weight:700;color:#0f172a;">Registration Confirmed</h1>
+                <p style="margin:0 0 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#475569;">
+                  Hi <strong>{{name}}</strong>,<br><br>
+                  Your registration for <a href="{{eventUrl}}" style="color:#004dff;text-decoration:none;font-weight:700;">{{eventTitle}}</a> has been successfully confirmed.
                 </p>
               {{/if}}
 
-              <!-- Event details card -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;">
+              <!-- Event Details Card -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:28px;width:100%;">
                 <tr>
                   <td style="padding:24px;">
-                    <p style="margin:0 0 12px;font-size:13px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Event Details</p>
-                    <p style="margin:0 0 8px;font-size:15px;color:#111827;"><strong>📅 Date:</strong> {{eventDate}}</p>
-                    <p style="margin:0 0 8px;font-size:15px;color:#111827;"><strong>🕐 Time:</strong> {{eventTime}}</p>
-                    {{#if isVirtual}}
-                      <p style="margin:0;font-size:15px;color:#111827;"><strong>🔗 Link:</strong> <a href="{{location}}" style="color:#4f46e5;">{{location}}</a></p>
-                    {{else}}
-                      <p style="margin:0;font-size:15px;color:#111827;"><strong>📍 Location:</strong> {{location}}</p>
-                    {{/if}}
+                    <span style="background-color:rgba(0,77,255,0.08);color:#004dff;padding:4px 10px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;display:inline-block;margin-bottom:20px;">
+                      Event Details
+                    </span>
+                    
+                    <table width="100%" cellpadding="0" cellspacing="0" style="width:100%;">
+                      <!-- Date Row -->
+                      <tr>
+                        <td style="padding-bottom:14px;vertical-align:middle;">
+                          <table cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;color:#004dff;text-transform:uppercase;letter-spacing:0.05em;background-color:rgba(0,77,255,0.08);padding:4px 8px;border-radius:6px;text-align:center;width:75px;display:inline-block;">
+                                Date
+                              </td>
+                              <td style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;color:#1e293b;padding-left:16px;">
+                                {{eventDate}}
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <!-- Time Row -->
+                      <tr>
+                        <td style="padding-bottom:14px;vertical-align:middle;">
+                          <table cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;color:#004dff;text-transform:uppercase;letter-spacing:0.05em;background-color:rgba(0,77,255,0.08);padding:4px 8px;border-radius:6px;text-align:center;width:75px;display:inline-block;">
+                                Time
+                              </td>
+                              <td style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;color:#1e293b;padding-left:16px;">
+                                {{eventTime}}
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <!-- Location Row -->
+                      <tr>
+                        <td style="vertical-align:middle;">
+                          <table cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;color:#004dff;text-transform:uppercase;letter-spacing:0.05em;background-color:rgba(0,77,255,0.08);padding:4px 8px;border-radius:6px;text-align:center;width:75px;display:inline-block;">
+                                {{#if isVirtual}}Link{{else}}Location{{/if}}
+                              </td>
+                              <td style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;color:#1e293b;padding-left:16px;">
+                                {{#if isVirtual}}
+                                  <a href="{{location}}" style="color:#004dff;text-decoration:none;font-weight:600;">Join Virtual Event</a>
+                                {{else}}
+                                  {{location}}
+                                {{/if}}
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
+
+              <!-- Cancellation Link (Plomo / Gray) -->
+              <p style="margin:24px 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;color:#64748b;text-align:center;line-height:20px;">
+                Can't make it anymore? You can <a href="{{eventUrl}}" target="_blank" style="color:#64748b;text-decoration:underline;font-weight:600;">cancel your registration</a>.
+              </p>
             </td>
           </tr>
           <!-- Footer -->
           <tr>
-            <td style="padding:24px 40px;border-top:1px solid #f3f4f6;text-align:center;">
-              <p style="margin:0;font-size:12px;color:#9ca3af;">You received this email because you registered for an event.</p>
+            <td style="padding:24px 32px;background-color:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;color:#94a3b8;line-height:18px;">
+              <p style="margin:0 0 6px;">Jala University Events Manager — Empowering Education</p>
+              <p style="margin:0;">This is an automated notification regarding your registration. Please do not reply directly to this email.</p>
             </td>
           </tr>
         </table>

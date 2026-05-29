@@ -80,6 +80,14 @@ export class NotificationsService implements OnModuleInit {
     let errorMessage: string | undefined;
 
     try {
+      const registration = await this.prisma.registration.findUnique({
+        where: { id: registrationId },
+        select: { token: true },
+      });
+      const frontendUrl = this.config.get<string>('FRONTEND_URL') || 'http://localhost:4200';
+      const cancelLink = registration ? `${frontendUrl}/cancel/${registration.token}` : '#';
+      const eventUrl = `${frontendUrl}/events/${event.id}`;
+
       const template = this.getCompiledTemplate('registration-confirmation');
       const html = template({
         name: user.full_name,
@@ -91,6 +99,9 @@ export class NotificationsService implements OnModuleInit {
         isVirtual: event.event_type === 'virtual',
         isWaitlisted,
         waitlistPosition,
+        frontendUrl,
+        cancelLink,
+        eventUrl,
       });
 
       const fromEmail =
@@ -156,6 +167,14 @@ export class NotificationsService implements OnModuleInit {
     let errorMessage: string | undefined;
 
     try {
+      const registration = await this.prisma.registration.findUnique({
+        where: { id: registrationId },
+        select: { token: true },
+      });
+      const frontendUrl = this.config.get<string>('FRONTEND_URL') || 'http://localhost:4200';
+      const cancelLink = registration ? `${frontendUrl}/cancel/${registration.token}` : '#';
+      const eventUrl = `${frontendUrl}/events/${event.id}`;
+
       const template = this.getCompiledTemplate('event-reminder');
       const html = template({
         name: user.full_name,
@@ -166,6 +185,9 @@ export class NotificationsService implements OnModuleInit {
           event.event_type === 'virtual' ? event.meeting_url : event.location,
         isVirtual: event.event_type === 'virtual',
         isOneHour,
+        frontendUrl,
+        cancelLink,
+        eventUrl,
       });
 
       const fromEmail =

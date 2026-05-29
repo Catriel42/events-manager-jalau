@@ -76,13 +76,14 @@ export class RegistrationsService {
       },
     });
 
-    // Fire-and-forget: send confirmation email (does not block the response)
-    void this.notifications.sendRegistrationConfirmation(
-      user,
-      event,
-      registration.id,
-      waitlistPosition ?? undefined,
-    );
+    // Fire-and-forget: send confirmation email only if confirmed (skip if waitlisted)
+    if (status === RegistrationStatus.confirmed) {
+      void this.notifications.sendRegistrationConfirmation(
+        user,
+        event,
+        registration.id,
+      );
+    }
 
     return registration;
   }
