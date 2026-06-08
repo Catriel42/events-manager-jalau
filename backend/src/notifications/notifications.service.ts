@@ -84,8 +84,11 @@ export class NotificationsService implements OnModuleInit {
         where: { id: registrationId },
         select: { token: true },
       });
-      const frontendUrl = this.config.get<string>('FRONTEND_URL') || 'http://localhost:4200';
-      const cancelLink = registration ? `${frontendUrl}/cancel/${registration.token}` : '#';
+      const frontendUrl =
+        this.config.get<string>('FRONTEND_URL') || 'http://localhost:4200';
+      const cancelLink = registration
+        ? `${frontendUrl}/cancel/${registration.token}`
+        : '#';
       const eventUrl = `${frontendUrl}/events/${event.id}`;
 
       const template = this.getCompiledTemplate('registration-confirmation');
@@ -171,8 +174,11 @@ export class NotificationsService implements OnModuleInit {
         where: { id: registrationId },
         select: { token: true },
       });
-      const frontendUrl = this.config.get<string>('FRONTEND_URL') || 'http://localhost:4200';
-      const cancelLink = registration ? `${frontendUrl}/cancel/${registration.token}` : '#';
+      const frontendUrl =
+        this.config.get<string>('FRONTEND_URL') || 'http://localhost:4200';
+      const cancelLink = registration
+        ? `${frontendUrl}/cancel/${registration.token}`
+        : '#';
       const eventUrl = `${frontendUrl}/events/${event.id}`;
 
       const template = this.getCompiledTemplate('event-reminder');
@@ -235,13 +241,16 @@ export class NotificationsService implements OnModuleInit {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+      timeZone: 'America/La_Paz',
     });
   }
 
   private formatTime(date: Date): string {
-    return new Date(date).toLocaleTimeString('en-US', {
+    const timeString = new Date(date).toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: 'America/La_Paz',
     });
+    return `${timeString} (UTC-4)`;
   }
 }
