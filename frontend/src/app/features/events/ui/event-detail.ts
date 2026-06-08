@@ -168,7 +168,15 @@ export class EventDetail {
       hour: '2-digit',
       minute: '2-digit'
     });
+
+    const offsetMinutes = startDate.getTimezoneOffset();
+    const absOffsetMinutes = Math.abs(offsetMinutes);
+    const hours = Math.floor(absOffsetMinutes / 60);
+    const minutes = absOffsetMinutes % 60;
+    const sign = offsetMinutes <= 0 ? '+' : '-';
+    const formattedMinutes = minutes === 0 ? '' : `:${minutes.toString().padStart(2, '0')}`;
+    const offsetStr = `(UTC${sign}${hours}${formattedMinutes})`;
     
-    return `${timeFormat.format(startDate)} - ${timeFormat.format(endDate)}`;
+    return `${timeFormat.format(startDate)} - ${timeFormat.format(endDate)} ${offsetStr}`;
   }
 }
