@@ -133,9 +133,9 @@ export class EventDetail {
   getEventStatusLabel(status: EventStatus): string {
     const labels: Record<EventStatus, string> = {
       draft: 'Draft',
-      published: 'New',
+      published: 'Upcoming',
       cancelled: 'Cancelled',
-      completed: 'Completed'
+      completed: 'Finished'
     };
     return labels[status];
   }
