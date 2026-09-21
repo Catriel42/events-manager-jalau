@@ -1,6 +1,6 @@
 # Event Manager - Jala U
 
-Monorepo for the Jala University Events Management Platform. Built with **NestJS 11**, **Angular v21**, and **Prisma 7**.
+Jala University Events Management Platform.
 
 [![Angular](https://img.shields.io/badge/Angular-21-DD0031?style=flat-square&logo=angular&logoColor=white)](https://angular.io/)
 [![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?style=flat-square&logo=nestjs&logoColor=white)](https://nestjs.com/)
@@ -10,6 +10,8 @@ Monorepo for the Jala University Events Management Platform. Built with **NestJS
 [![Docker](https://img.shields.io/badge/Docker-24-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Playwright](https://img.shields.io/badge/Playwright-E2E-2EAD33?style=flat-square&logo=playwright&logoColor=white)](https://playwright.dev/)
 [![k6](https://img.shields.io/badge/k6-Load--Testing-7C6BFF?style=flat-square&logo=k6&logoColor=white)](https://k6.io/)
+
+<img width="1414" height="899" alt="image" src="https://github.com/user-attachments/assets/887e197f-528e-497c-a8b8-3206d38bbb06" />
 
 ---
 
